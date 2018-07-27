@@ -1,0 +1,8 @@
+package: github.com/reactiveops/rbac-summarizer
+import:
+- package: k8s.io/client-go
+  version: v8.0.0
+- package: github.com/fatih/color
+  version: v1.7.0
+- package: github.com/json-iterator/go
+  version: 1.1.4
