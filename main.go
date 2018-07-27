@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"text/tabwriter"
 
-	"github.com/fatih/color"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -17,9 +17,8 @@ import (
 )
 
 type RbacSubject struct {
-	Kind             string
-	ClusterWideRoles []SimpleRole
-	RolesByNamespace map[string][]SimpleRole
+	Kind         string
+	RolesByScope map[string][]SimpleRole
 }
 
 type SimpleRole struct {
@@ -68,8 +67,8 @@ func main() {
 				addSimpleRole(&rbacSubject, &roleBinding)
 			} else {
 				rbacSubject := RbacSubject{
-					Kind:             subject.Kind,
-					RolesByNamespace: make(map[string][]SimpleRole),
+					Kind:         subject.Kind,
+					RolesByScope: make(map[string][]SimpleRole),
 				}
 				addSimpleRole(&rbacSubject, &roleBinding)
 				rbacBindings[subject.Name] = rbacSubject
@@ -89,8 +88,8 @@ func main() {
 				addSimpleRoleCRB(&rbacSubject, &clusterRoleBinding)
 			} else {
 				rbacSubject := RbacSubject{
-					Kind:             subject.Kind,
-					RolesByNamespace: make(map[string][]SimpleRole),
+					Kind:         subject.Kind,
+					RolesByScope: make(map[string][]SimpleRole),
 				}
 				addSimpleRoleCRB(&rbacSubject, &clusterRoleBinding)
 				rbacBindings[subject.Name] = rbacSubject
@@ -102,32 +101,31 @@ func main() {
 }
 
 func printRbacBindings(rbacBindings map[string]RbacSubject) {
+	if len(rbacBindings) < 1 {
+		fmt.Println("No RBAC Bindings found")
+		return
+	}
+
 	names := make([]string, 0, len(rbacBindings))
 	for name := range rbacBindings {
 		names = append(names, name)
 	}
 	sort.Strings(names)
 
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+
+	// fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE\t SOURCE")
+	fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE")
 	for _, subjectName := range names {
 		rbacSubject := rbacBindings[subjectName]
-		color.Green("%s (%s)", subjectName, rbacSubject.Kind)
-		if len(rbacSubject.ClusterWideRoles) > 0 {
-			color.Cyan("- cluster wide")
-			for _, simpleRole := range rbacSubject.ClusterWideRoles {
-				fmt.Printf("  - %s: %s\n", simpleRole.Kind, simpleRole.Name)
-				fmt.Printf("    source: %s\n", simpleRole.Source)
-			}
-		}
-
-		for namespace, simpleRoles := range rbacSubject.RolesByNamespace {
-			color.Cyan("- %s", namespace)
+		for scope, simpleRoles := range rbacSubject.RolesByScope {
 			for _, simpleRole := range simpleRoles {
-				fmt.Printf("  - %s: %s\n", simpleRole.Kind, simpleRole.Name)
-				fmt.Printf("    source: %s\n", simpleRole.Source)
+				fmt.Fprintf(w, "%s \t %s\t %s/%s\n", subjectName, scope, simpleRole.Kind, simpleRole.Name)
 			}
 		}
-		fmt.Println("")
 	}
+	w.Flush()
 }
 
 func addSimpleRoleCRB(rbacSubject *RbacSubject, clusterRoleBinding *rbacv1.ClusterRoleBinding) {
@@ -136,28 +134,19 @@ func addSimpleRoleCRB(rbacSubject *RbacSubject, clusterRoleBinding *rbacv1.Clust
 		Source: SimpleRoleSource{Name: clusterRoleBinding.Name, Kind: "ClusterRoleBinding"},
 	}
 
-	if clusterRoleBinding.RoleRef.Kind == "ClusterRole" {
-		simpleRole.Kind = "cluster role"
-	} else {
-		simpleRole.Kind = "role"
-	}
-
-	rbacSubject.ClusterWideRoles = append(rbacSubject.ClusterWideRoles, simpleRole)
+	simpleRole.Kind = clusterRoleBinding.RoleRef.Kind
+	scope := "cluster-wide"
+	rbacSubject.RolesByScope[scope] = append(rbacSubject.RolesByScope[scope], simpleRole)
 }
 
 func addSimpleRole(rbacSubject *RbacSubject, roleBinding *rbacv1.RoleBinding) {
 	simpleRole := SimpleRole{
 		Name:   roleBinding.RoleRef.Name,
-		Source: SimpleRoleSource{Name: roleBinding.Name, Kind: "ClusterRoleBinding"},
+		Source: SimpleRoleSource{Name: roleBinding.Name, Kind: "RoleBinding"},
 	}
 
-	if roleBinding.RoleRef.Kind == "ClusterRole" {
-		simpleRole.Kind = "cluster role"
-	} else {
-		simpleRole.Kind = "role"
-	}
-
-	rbacSubject.RolesByNamespace[roleBinding.Namespace] = append(rbacSubject.RolesByNamespace[roleBinding.Namespace], simpleRole)
+	simpleRole.Kind = roleBinding.RoleRef.Kind
+	rbacSubject.RolesByScope[roleBinding.Namespace] = append(rbacSubject.RolesByScope[roleBinding.Namespace], simpleRole)
 }
 
 func homeDir() string {
