@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -32,6 +33,7 @@ type simpleRoleSource struct {
 type lister struct {
 	rbacSubjectsByScope map[string]rbacSubject
 	clientset           kubernetes.Clientset
+	filter              string
 }
 
 func (l *lister) loadAll() error {
@@ -59,15 +61,17 @@ func (l *lister) loadRoleBindings() error {
 
 	for _, roleBinding := range roleBindings.Items {
 		for _, subject := range roleBinding.Subjects {
-			if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
-				rbacSubj.addRoleBinding(&roleBinding)
-			} else {
-				rbacSubj := rbacSubject{
-					Kind:         subject.Kind,
-					RolesByScope: make(map[string][]simpleRole),
+			if l.filter == "" || strings.Contains(subject.Name, l.filter) {
+				if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
+					rbacSubj.addRoleBinding(&roleBinding)
+				} else {
+					rbacSubj := rbacSubject{
+						Kind:         subject.Kind,
+						RolesByScope: make(map[string][]simpleRole),
+					}
+					rbacSubj.addRoleBinding(&roleBinding)
+					l.rbacSubjectsByScope[subject.Name] = rbacSubj
 				}
-				rbacSubj.addRoleBinding(&roleBinding)
-				l.rbacSubjectsByScope[subject.Name] = rbacSubj
 			}
 		}
 	}
@@ -84,15 +88,17 @@ func (l *lister) loadClusterRoleBindings() error {
 
 	for _, clusterRoleBinding := range clusterRoleBindings.Items {
 		for _, subject := range clusterRoleBinding.Subjects {
-			if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
-				rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
-			} else {
-				rbacSubj := rbacSubject{
-					Kind:         subject.Kind,
-					RolesByScope: make(map[string][]simpleRole),
+			if l.filter == "" || strings.Contains(subject.Name, l.filter) {
+				if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
+					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
+				} else {
+					rbacSubj := rbacSubject{
+						Kind:         subject.Kind,
+						RolesByScope: make(map[string][]simpleRole),
+					}
+					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
+					l.rbacSubjectsByScope[subject.Name] = rbacSubj
 				}
-				rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
-				l.rbacSubjectsByScope[subject.Name] = rbacSubj
 			}
 		}
 	}
@@ -100,7 +106,7 @@ func (l *lister) loadClusterRoleBindings() error {
 	return nil
 }
 
-func (l *lister) printRbacBindings() {
+func (l *lister) printRbacBindings(outputFormat string) {
 	if len(l.rbacSubjectsByScope) < 1 {
 		fmt.Println("No RBAC Bindings found")
 		return
@@ -115,13 +121,21 @@ func (l *lister) printRbacBindings() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 
-	// fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE\t SOURCE")
-	fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE")
+	if outputFormat == "wide" {
+		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE\t SOURCE")
+	} else {
+		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE")
+	}
+
 	for _, subjectName := range names {
 		rbacSubject := l.rbacSubjectsByScope[subjectName]
 		for scope, simpleRoles := range rbacSubject.RolesByScope {
 			for _, simpleRole := range simpleRoles {
-				fmt.Fprintf(w, "%s \t %s\t %s/%s\n", subjectName, scope, simpleRole.Kind, simpleRole.Name)
+				if outputFormat == "wide" {
+					fmt.Fprintf(w, "%s/%s \t %s\t %s/%s\t %s/%s\n", rbacSubject.Kind, subjectName, scope, simpleRole.Kind, simpleRole.Name, simpleRole.Source.Kind, simpleRole.Source.Name)
+				} else {
+					fmt.Fprintf(w, "%s \t %s\t %s/%s\n", subjectName, scope, simpleRole.Kind, simpleRole.Name)
+				}
 			}
 		}
 	}

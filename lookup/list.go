@@ -11,17 +11,21 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
-func ListAll() {
+func List(args []string, outputFormat string) {
 	clientset, err := getClientSet()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	l := lister{clientset: *clientset, rbacSubjectsByScope: make(map[string]rbacSubject)}
+	l := lister{
+		filter:              args[0],
+		clientset:           *clientset,
+		rbacSubjectsByScope: make(map[string]rbacSubject),
+	}
 
 	l.loadAll()
 
-	l.printRbacBindings()
+	l.printRbacBindings(outputFormat)
 }
 
 func getClientSet() (*kubernetes.Clientset, error) {
