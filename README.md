@@ -1,6 +1,6 @@
 # rbac-lookup
 
-This is a simple project that allows you to easily find roles and cluster roles attached to any user, service account, or group name.
+This is a simple project that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
 
 ## Usage
 

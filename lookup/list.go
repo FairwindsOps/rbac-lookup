@@ -33,7 +33,7 @@ func List(args []string, outputFormat string) {
 
 	filter := ""
 	if len(args) > 0 {
-		filter = args[1]
+		filter = args[0]
 	}
 
 	l := lister{
