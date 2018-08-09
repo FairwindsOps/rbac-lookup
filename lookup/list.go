@@ -16,6 +16,7 @@ package lookup
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -48,16 +49,19 @@ func List(args []string, outputFormat string) {
 }
 
 func getClientSet() (*kubernetes.Clientset, error) {
-	var kubeconfig *string
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	var kubeconfig string
+	if os.Getenv("KUBECONFIG") != "" {
+		kubeconfig = os.Getenv("KUBECONFIG")
+	} else if home := homeDir(); home != "" {
+		kubeconfig = filepath.Join(home, ".kube", "config")
 	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		fmt.Println("Parsing kubeconfig failed, please set KUBECONFIG env var")
+		os.Exit(1)
 	}
 	flag.Parse()
 
 	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err.Error())
 	}

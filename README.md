@@ -31,7 +31,8 @@ User/ron@example.com      web               ClusterRole/edit    RoleBinding/ron-
 ServiceAccount/rops       infra             ClusterRole/admin   RoleBinding/rops-admin
 ```
 
-
+### Kubernetes Configuration
+If a `KUBECONFIG` environment variable is specified, rbac-lookup will attempt to use the config at that path, otherwise it will default to `~/.kube/config`.
 
 ## License
 Apache License 2.0
