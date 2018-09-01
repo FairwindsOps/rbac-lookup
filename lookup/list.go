@@ -43,7 +43,11 @@ func List(args []string, outputFormat string) {
 		rbacSubjectsByScope: make(map[string]rbacSubject),
 	}
 
-	l.loadAll()
+	loadErr := l.loadAll()
+	if loadErr != nil {
+		fmt.Printf("Error loading RBAC: %v\n", loadErr)
+		os.Exit(1)
+	}
 
 	l.printRbacBindings(outputFormat)
 }
