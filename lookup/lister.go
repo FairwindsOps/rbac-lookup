@@ -25,6 +25,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
+
+	// Required for GKE Auth
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
@@ -46,7 +48,7 @@ type simpleRoleSource struct {
 
 type lister struct {
 	rbacSubjectsByScope map[string]rbacSubject
-	clientset           kubernetes.Clientset
+	clientset           kubernetes.Interface
 	filter              string
 }
 

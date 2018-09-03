@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/reactiveops/rbac-lookup
+
+    docker:
+      - image: circleci/golang:1.10
+
+    steps:
+      - checkout
+      - run: curl https://glide.sh/get | sh
+      - run: glide install
+      - run: go test -v ./lookup/...
