@@ -39,7 +39,7 @@ func List(args []string, outputFormat string) {
 
 	l := lister{
 		filter:              filter,
-		clientset:           *clientset,
+		clientset:           clientset,
 		rbacSubjectsByScope: make(map[string]rbacSubject),
 	}
 

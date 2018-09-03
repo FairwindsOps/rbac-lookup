@@ -46,7 +46,7 @@ type simpleRoleSource struct {
 
 type lister struct {
 	rbacSubjectsByScope map[string]rbacSubject
-	clientset           kubernetes.Clientset
+	clientset           kubernetes.Interface
 	filter              string
 }
 
