@@ -23,9 +23,11 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
+	// Required for GKE Auth
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
+// List outputs rbac bindings where subject names match given string
 func List(args []string, outputFormat string) {
 	clientset, err := getClientSet()
 	if err != nil {
