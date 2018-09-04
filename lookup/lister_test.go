@@ -41,7 +41,7 @@ func TestLoadRoleBindings(t *testing.T) {
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
-			"foo": []simpleRole{{
+			"foo": {{
 				Kind: "Role",
 				Name: "bar",
 				Source: simpleRoleSource{
@@ -72,7 +72,7 @@ func TestLoadClusterRoleBindings(t *testing.T) {
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
-			"cluster-wide": []simpleRole{{
+			"cluster-wide": {{
 				Kind: "ClusterRole",
 				Name: "bar",
 				Source: simpleRoleSource{
@@ -105,7 +105,7 @@ func TestLoadAll(t *testing.T) {
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
-			"cluster-wide": []simpleRole{{
+			"cluster-wide": {{
 				Kind: "ClusterRole",
 				Name: "bar",
 				Source: simpleRoleSource{
@@ -113,7 +113,7 @@ func TestLoadAll(t *testing.T) {
 					Name: "testing",
 				},
 			}},
-			"foo": []simpleRole{{
+			"foo": {{
 				Kind: "Role",
 				Name: "bar",
 				Source: simpleRoleSource{

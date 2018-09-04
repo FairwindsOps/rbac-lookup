@@ -20,3 +20,11 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+brew:
+  github:
+    owner: reactiveops
+    name: homebrew-tap
+  folder: Formula
+  description: Reverse Lookup for Kubernetes RBAC
+  test: |
+    system "#{bin}/rbac-lookup version"
