@@ -4,6 +4,13 @@
 
 This is a simple project that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
 
+## Installation
+
+### Homebrew
+```
+brew install reactiveops/tap/rbac-lookup
+```
+
 ## Usage
 
 ```

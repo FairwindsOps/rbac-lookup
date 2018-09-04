@@ -1,0 +1,9 @@
+name: "rbac-lookup"
+shortDesc: "Reverse lookup for RBAC"
+longDesc: "Look up role bindings and cluster role bindings by subject names"
+example: "rbac-lookup rob -owide"
+command: "./rbac-lookup"
+flags:
+- name: "output"
+  shorthand: "o"
+  desc: "Optional paramater to provide wide output"
