@@ -42,6 +42,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output format (normal,wide)")
 }
 
+// Execute is the primary entrypoint for this CLI
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
