@@ -66,6 +66,13 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	}
 	flag.Parse()
 
+
+  if _, err := os.Stat(kubeconfig); err != nil {
+    // kubeconfig doesn't exist
+    fmt.Printf("%s does not exist - please make sure you have a kubeconfig configured.\n", kubeconfig)
+    os.Exit(1)
+  }
+
 	// use the current context in kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
