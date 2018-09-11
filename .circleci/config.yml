@@ -11,3 +11,29 @@ jobs:
       - run: curl https://glide.sh/get | sh
       - run: glide install
       - run: go test -v ./lookup/...
+
+  release:
+    working_directory: /go/src/github.com/reactiveops/rbac-lookup
+
+    docker:
+      - image: goreleaser/goreleaser
+
+    steps:
+      - checkout
+      - run: curl https://glide.sh/get | sh
+      - run: glide install
+      - run: goreleaser
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+  release:
+    jobs:
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
