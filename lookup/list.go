@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -27,12 +28,21 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
+type clusterInfo struct {
+	ClusterName    string
+	GkeZone        string
+	GkeProjectName string
+}
+
 // List outputs rbac bindings where subject names match given string
 func List(args []string, outputFormat string) {
-	clientset, err := getClientSet()
+	kubeconfig := getKubeConfig()
+	clientset, err := getClientSet(kubeconfig)
 	if err != nil {
 		panic(err.Error())
 	}
+
+	ci := getClusterInfo(kubeconfig)
 
 	filter := ""
 	if len(args) > 0 {
@@ -42,6 +52,7 @@ func List(args []string, outputFormat string) {
 	l := lister{
 		filter:              filter,
 		clientset:           clientset,
+		gkeProjectName:      ci.GkeProjectName,
 		rbacSubjectsByScope: make(map[string]rbacSubject),
 	}
 
@@ -54,7 +65,7 @@ func List(args []string, outputFormat string) {
 	l.printRbacBindings(outputFormat)
 }
 
-func getClientSet() (*kubernetes.Clientset, error) {
+func getKubeConfig() string {
 	var kubeconfig string
 	if os.Getenv("KUBECONFIG") != "" {
 		kubeconfig = os.Getenv("KUBECONFIG")
@@ -64,19 +75,38 @@ func getClientSet() (*kubernetes.Clientset, error) {
 		fmt.Println("Parsing kubeconfig failed, please set KUBECONFIG env var")
 		os.Exit(1)
 	}
+
+	if _, err := os.Stat(kubeconfig); err != nil {
+		// kubeconfig doesn't exist
+		fmt.Printf("%s does not exist - please make sure you have a kubeconfig configured.\n", kubeconfig)
+		panic(err.Error())
+	}
+
+	return kubeconfig
+}
+
+func getClusterInfo(kubeconfig string) *clusterInfo {
+	c, err := clientcmd.LoadFromFile(kubeconfig)
+	if err != nil {
+		panic(err.Error())
+	}
+	s := strings.Split(c.CurrentContext, "_")
+	if s[0] == "gke" {
+		return &clusterInfo{
+			ClusterName:    s[3],
+			GkeZone:        s[2],
+			GkeProjectName: s[1],
+		}
+	}
+	return &clusterInfo{}
+}
+
+func getClientSet(kubeconfig string) (*kubernetes.Clientset, error) {
 	flag.Parse()
-
-
-        if _, err := os.Stat(kubeconfig); err != nil {
-          // kubeconfig doesn't exist
-          fmt.Printf("%s does not exist - please make sure you have a kubeconfig configured.\n", kubeconfig)
-          os.Exit(1)
-        }
-
 	// use the current context in kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	// create the clientset

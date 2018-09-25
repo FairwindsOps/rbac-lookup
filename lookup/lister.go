@@ -21,6 +21,10 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/cloudresourcemanager/v1"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -47,9 +51,10 @@ type simpleRoleSource struct {
 }
 
 type lister struct {
-	rbacSubjectsByScope map[string]rbacSubject
 	clientset           kubernetes.Interface
 	filter              string
+	gkeProjectName      string
+	rbacSubjectsByScope map[string]rbacSubject
 }
 
 func (l *lister) loadAll() error {
@@ -63,6 +68,12 @@ func (l *lister) loadAll() error {
 
 	if crbErr != nil {
 		return crbErr
+	}
+
+	gkeErr := l.loadGkeRoleBindings()
+
+	if gkeErr != nil {
+		return gkeErr
 	}
 
 	return nil
@@ -177,4 +188,53 @@ func (rbacSubj *rbacSubject) addRoleBinding(roleBinding *rbacv1.RoleBinding) {
 
 	simpleRole.Kind = roleBinding.RoleRef.Kind
 	rbacSubj.RolesByScope[roleBinding.Namespace] = append(rbacSubj.RolesByScope[roleBinding.Namespace], simpleRole)
+}
+
+func (l *lister) loadGkeRoleBindings() error {
+	ctx := context.Background()
+
+	c, err := google.DefaultClient(ctx, cloudresourcemanager.CloudPlatformScope)
+	if err != nil {
+		return err
+	}
+
+	crmService, err := cloudresourcemanager.New(c)
+	if err != nil {
+		return err
+	}
+
+	resource := l.gkeProjectName
+
+	ipr := &cloudresourcemanager.GetIamPolicyRequest{}
+
+	resp, err := crmService.Projects.GetIamPolicy(resource, ipr).Context(ctx).Do()
+	if err != nil {
+		return err
+	}
+
+	scope := "project-wide"
+
+	for _, binding := range resp.Bindings {
+		if sr, ok := gkeIamRoles[binding.Role]; ok {
+			for _, member := range binding.Members {
+				s := strings.Split(member, ":")
+				memberKind := strings.Title(s[0])
+				memberName := s[1]
+				if l.filter == "" || strings.Contains(memberName, l.filter) {
+					rbacSubj, exist := l.rbacSubjectsByScope[memberName]
+					if !exist {
+						rbacSubj = rbacSubject{
+							Kind:         memberKind,
+							RolesByScope: make(map[string][]simpleRole),
+						}
+					}
+
+					rbacSubj.RolesByScope[scope] = append(rbacSubj.RolesByScope[scope], sr)
+					l.rbacSubjectsByScope[memberName] = rbacSubj
+				}
+			}
+		}
+	}
+
+	return nil
 }
