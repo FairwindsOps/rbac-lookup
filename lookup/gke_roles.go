@@ -14,6 +14,7 @@
 
 package lookup
 
+var gkeIamScope = "project-wide"
 var gkeIamRoles = map[string]simpleRole{
 	"roles/container.clusterAdmin": {
 		Kind: "IAM",

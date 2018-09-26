@@ -23,6 +23,7 @@ import (
 )
 
 var output string
+var gke bool
 
 var rootCmd = &cobra.Command{
 	Use:   "rbac-lookup [subject query]",
@@ -34,12 +35,13 @@ var rootCmd = &cobra.Command{
 			fmt.Printf("Error parsing flags: %v", err)
 		}
 
-		lookup.List(args, output)
+		lookup.List(args, output, gke)
 	},
 }
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output format (normal,wide)")
+	rootCmd.PersistentFlags().BoolVar(&gke, "gke", false, "enable GKE integration")
 }
 
 // Execute is the primary entrypoint for this CLI

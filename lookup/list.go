@@ -35,14 +35,12 @@ type clusterInfo struct {
 }
 
 // List outputs rbac bindings where subject names match given string
-func List(args []string, outputFormat string) {
+func List(args []string, outputFormat string, enableGke bool) {
 	kubeconfig := getKubeConfig()
 	clientset, err := getClientSet(kubeconfig)
 	if err != nil {
 		panic(err.Error())
 	}
-
-	ci := getClusterInfo(kubeconfig)
 
 	filter := ""
 	if len(args) > 0 {
@@ -52,8 +50,12 @@ func List(args []string, outputFormat string) {
 	l := lister{
 		filter:              filter,
 		clientset:           clientset,
-		gkeProjectName:      ci.GkeProjectName,
 		rbacSubjectsByScope: make(map[string]rbacSubject),
+	}
+
+	if enableGke {
+		ci := getClusterInfo(kubeconfig)
+		l.gkeProjectName = ci.GkeProjectName
 	}
 
 	loadErr := l.loadAll()
@@ -90,12 +92,16 @@ func getClusterInfo(kubeconfig string) *clusterInfo {
 	if err != nil {
 		panic(err.Error())
 	}
-	s := strings.Split(c.CurrentContext, "_")
-	if s[0] == "gke" {
-		return &clusterInfo{
-			ClusterName:    s[3],
-			GkeZone:        s[2],
-			GkeProjectName: s[1],
+
+	currentContext := c.Contexts[c.CurrentContext]
+	if currentContext.Cluster != "" {
+		s := strings.Split(currentContext.Cluster, "_")
+		if s[0] == "gke" {
+			return &clusterInfo{
+				ClusterName:    s[3],
+				GkeZone:        s[2],
+				GkeProjectName: s[1],
+			}
 		}
 	}
 	return &clusterInfo{}
