@@ -18,7 +18,7 @@ var gkeIamScope = "project-wide"
 var gkeIamRoles = map[string]simpleRole{
 	"roles/container.clusterAdmin": {
 		Kind: "IAM",
-		Name: "cluster-admin",
+		Name: "gke-cluster-admin",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "container.clusterAdmin",
@@ -26,7 +26,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/container.admin": {
 		Kind: "IAM",
-		Name: "admin",
+		Name: "gke-admin",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "container.admin",
@@ -34,7 +34,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/container.developer": {
 		Kind: "IAM",
-		Name: "edit",
+		Name: "gke-developer",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "container.developer",
@@ -42,7 +42,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/container.viewer": {
 		Kind: "IAM",
-		Name: "view",
+		Name: "gke-viewer",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "container.viewer",
@@ -50,7 +50,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/owner": {
 		Kind: "IAM",
-		Name: "cluster-admin",
+		Name: "gcp-owner",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "owner",
@@ -58,7 +58,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/admin": {
 		Kind: "IAM",
-		Name: "admin",
+		Name: "gcp-admin",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "admin",
@@ -66,7 +66,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/editor": {
 		Kind: "IAM",
-		Name: "edit",
+		Name: "gcp-editor",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "editor",
@@ -74,7 +74,7 @@ var gkeIamRoles = map[string]simpleRole{
 	},
 	"roles/viewer": {
 		Kind: "IAM",
-		Name: "view",
+		Name: "gcp-viewer",
 		Source: simpleRoleSource{
 			Kind: "IAMRole",
 			Name: "viewer",

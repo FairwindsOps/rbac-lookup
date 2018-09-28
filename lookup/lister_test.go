@@ -19,6 +19,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"google.golang.org/api/cloudresourcemanager/v1"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -126,6 +128,95 @@ func TestLoadAll(t *testing.T) {
 
 	assert.EqualValues(t, l.rbacSubjectsByScope["joe"], expectedRbacSubject)
 	assert.EqualValues(t, l.rbacSubjectsByScope["sue"], expectedRbacSubject)
+}
+
+func TestLoadGke(t *testing.T) {
+	policy := &cloudresourcemanager.Policy{
+		Bindings: []*cloudresourcemanager.Binding{{
+			Role:    "roles/container.admin",
+			Members: []string{"user:jane@example.com", "user:joe@example.com"},
+		}, {
+			Role:    "roles/container.developer",
+			Members: []string{"serviceAccount:ci@example.iam.gserviceaccount.com"},
+		}, {
+			Role:    "roles/viewer",
+			Members: []string{"group:devs@example.com"},
+		}, {
+			Role:    "roles/owner",
+			Members: []string{"user:jane@example.com"},
+		}},
+	}
+
+	l := genLister()
+
+	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+
+	l.loadGkeIamPolicy(policy)
+
+	assert.Len(t, l.rbacSubjectsByScope, 4, "Expected 2 rbac subjects")
+
+	assert.EqualValues(t, l.rbacSubjectsByScope["jane@example.com"], rbacSubject{
+		Kind: "User",
+		RolesByScope: map[string][]simpleRole{
+			"project-wide": {{
+				Kind: "IAM",
+				Name: "gke-admin",
+				Source: simpleRoleSource{
+					Kind: "IAMRole",
+					Name: "container.admin",
+				},
+			}, {
+				Kind: "IAM",
+				Name: "gcp-owner",
+				Source: simpleRoleSource{
+					Kind: "IAMRole",
+					Name: "owner",
+				},
+			}},
+		},
+	})
+
+	assert.EqualValues(t, l.rbacSubjectsByScope["joe@example.com"], rbacSubject{
+		Kind: "User",
+		RolesByScope: map[string][]simpleRole{
+			"project-wide": {{
+				Kind: "IAM",
+				Name: "gke-admin",
+				Source: simpleRoleSource{
+					Kind: "IAMRole",
+					Name: "container.admin",
+				},
+			}},
+		},
+	})
+
+	assert.EqualValues(t, l.rbacSubjectsByScope["devs@example.com"], rbacSubject{
+		Kind: "Group",
+		RolesByScope: map[string][]simpleRole{
+			"project-wide": {{
+				Kind: "IAM",
+				Name: "gcp-viewer",
+				Source: simpleRoleSource{
+					Kind: "IAMRole",
+					Name: "viewer",
+				},
+			}},
+		},
+	})
+
+	assert.EqualValues(t, l.rbacSubjectsByScope["ci@example.iam.gserviceaccount.com"], rbacSubject{
+		Kind: "ServiceAccount",
+		RolesByScope: map[string][]simpleRole{
+			"project-wide": {{
+				Kind: "IAM",
+				Name: "gke-developer",
+				Source: simpleRoleSource{
+					Kind: "IAMRole",
+					Name: "container.developer",
+				},
+			}},
+		},
+	})
 }
 
 func genLister() lister {
