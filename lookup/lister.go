@@ -21,7 +21,10 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	rbacv1 "k8s.io/api/rbac/v1"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/cloudresourcemanager/v1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
@@ -30,26 +33,11 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
-type rbacSubject struct {
-	Kind         string
-	RolesByScope map[string][]simpleRole
-}
-
-type simpleRole struct {
-	Kind   string
-	Name   string
-	Source simpleRoleSource
-}
-
-type simpleRoleSource struct {
-	Kind string
-	Name string
-}
-
 type lister struct {
-	rbacSubjectsByScope map[string]rbacSubject
 	clientset           kubernetes.Interface
 	filter              string
+	gkeProjectName      string
+	rbacSubjectsByScope map[string]rbacSubject
 }
 
 func (l *lister) loadAll() error {
@@ -65,7 +53,51 @@ func (l *lister) loadAll() error {
 		return crbErr
 	}
 
+	if l.gkeProjectName != "" {
+		gkeErr := l.loadGkeRoleBindings()
+
+		if gkeErr != nil {
+			return gkeErr
+		}
+	}
+
 	return nil
+}
+
+func (l *lister) printRbacBindings(outputFormat string) {
+	if len(l.rbacSubjectsByScope) < 1 {
+		fmt.Println("No RBAC Bindings found")
+		return
+	}
+
+	names := make([]string, 0, len(l.rbacSubjectsByScope))
+	for name := range l.rbacSubjectsByScope {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+
+	if outputFormat == "wide" {
+		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE\t SOURCE")
+	} else {
+		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE")
+	}
+
+	for _, subjectName := range names {
+		rbacSubject := l.rbacSubjectsByScope[subjectName]
+		for scope, simpleRoles := range rbacSubject.RolesByScope {
+			for _, simpleRole := range simpleRoles {
+				if outputFormat == "wide" {
+					fmt.Fprintf(w, "%s/%s \t %s\t %s/%s\t %s/%s\n", rbacSubject.Kind, subjectName, scope, simpleRole.Kind, simpleRole.Name, simpleRole.Source.Kind, simpleRole.Source.Name)
+				} else {
+					fmt.Fprintf(w, "%s \t %s\t %s/%s\n", subjectName, scope, simpleRole.Kind, simpleRole.Name)
+				}
+			}
+		}
+	}
+	w.Flush()
 }
 
 func (l *lister) loadRoleBindings() error {
@@ -122,59 +154,52 @@ func (l *lister) loadClusterRoleBindings() error {
 	return nil
 }
 
-func (l *lister) printRbacBindings(outputFormat string) {
-	if len(l.rbacSubjectsByScope) < 1 {
-		fmt.Println("No RBAC Bindings found")
-		return
-	}
+func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
+	for _, binding := range policy.Bindings {
+		if sr, ok := gkeIamRoles[binding.Role]; ok {
+			for _, member := range binding.Members {
+				s := strings.Split(member, ":")
+				memberKind := strings.Title(s[0])
+				memberName := s[1]
+				if l.filter == "" || strings.Contains(memberName, l.filter) {
+					rbacSubj, exist := l.rbacSubjectsByScope[memberName]
+					if !exist {
+						rbacSubj = rbacSubject{
+							Kind:         memberKind,
+							RolesByScope: make(map[string][]simpleRole),
+						}
+					}
 
-	names := make([]string, 0, len(l.rbacSubjectsByScope))
-	for name := range l.rbacSubjectsByScope {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-
-	if outputFormat == "wide" {
-		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE\t SOURCE")
-	} else {
-		fmt.Fprintln(w, "SUBJECT\t SCOPE\t ROLE")
-	}
-
-	for _, subjectName := range names {
-		rbacSubject := l.rbacSubjectsByScope[subjectName]
-		for scope, simpleRoles := range rbacSubject.RolesByScope {
-			for _, simpleRole := range simpleRoles {
-				if outputFormat == "wide" {
-					fmt.Fprintf(w, "%s/%s \t %s\t %s/%s\t %s/%s\n", rbacSubject.Kind, subjectName, scope, simpleRole.Kind, simpleRole.Name, simpleRole.Source.Kind, simpleRole.Source.Name)
-				} else {
-					fmt.Fprintf(w, "%s \t %s\t %s/%s\n", subjectName, scope, simpleRole.Kind, simpleRole.Name)
+					rbacSubj.RolesByScope[gkeIamScope] = append(rbacSubj.RolesByScope[gkeIamScope], sr)
+					l.rbacSubjectsByScope[memberName] = rbacSubj
 				}
 			}
 		}
 	}
-	w.Flush()
 }
 
-func (rbacSubj *rbacSubject) addClusterRoleBinding(clusterRoleBinding *rbacv1.ClusterRoleBinding) {
-	simpleRole := simpleRole{
-		Name:   clusterRoleBinding.RoleRef.Name,
-		Source: simpleRoleSource{Name: clusterRoleBinding.Name, Kind: "ClusterRoleBinding"},
+func (l *lister) loadGkeRoleBindings() error {
+	ctx := context.Background()
+
+	c, err := google.DefaultClient(ctx, cloudresourcemanager.CloudPlatformScope)
+	if err != nil {
+		return err
 	}
 
-	simpleRole.Kind = clusterRoleBinding.RoleRef.Kind
-	scope := "cluster-wide"
-	rbacSubj.RolesByScope[scope] = append(rbacSubj.RolesByScope[scope], simpleRole)
-}
-
-func (rbacSubj *rbacSubject) addRoleBinding(roleBinding *rbacv1.RoleBinding) {
-	simpleRole := simpleRole{
-		Name:   roleBinding.RoleRef.Name,
-		Source: simpleRoleSource{Name: roleBinding.Name, Kind: "RoleBinding"},
+	crmService, err := cloudresourcemanager.New(c)
+	if err != nil {
+		return err
 	}
 
-	simpleRole.Kind = roleBinding.RoleRef.Kind
-	rbacSubj.RolesByScope[roleBinding.Namespace] = append(rbacSubj.RolesByScope[roleBinding.Namespace], simpleRole)
+	resource := l.gkeProjectName
+	ipr := &cloudresourcemanager.GetIamPolicyRequest{}
+
+	policy, err := crmService.Projects.GetIamPolicy(resource, ipr).Context(ctx).Do()
+	if err != nil {
+		return err
+	}
+
+	l.loadGkeIamPolicy(policy)
+
+	return nil
 }
