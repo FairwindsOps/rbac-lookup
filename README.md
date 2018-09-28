@@ -53,7 +53,7 @@ User/rob@example.com      nginx-ingress     ClusterRole/edit    RoleBinding/rob-
 
 ### GKE IAM Integration
 
-If you're connected to a GKE cluster, RBAC is only half the story here. Google Cloud IAM roles can grant cluster access. Cluster access is effectively determined by a union of IAM and RBAC roles. To see th relevant IAM roles along with RBAC roles, use the `--gke` flag.
+If you're connected to a GKE cluster, RBAC is only half the story here. Google Cloud IAM roles can grant cluster access. Cluster access is effectively determined by a union of IAM and RBAC roles. To see the relevant IAM roles along with RBAC roles, use the `--gke` flag.
 
 ```
 rbac-lookup rob --gke
