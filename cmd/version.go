@@ -28,6 +28,6 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of rbac-lookup",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("rbac-lookup version 0.1.0")
+		fmt.Println("rbac-lookup version 0.2.0")
 	},
 }
