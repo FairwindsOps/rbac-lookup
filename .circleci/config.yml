@@ -20,8 +20,8 @@ jobs:
 
     steps:
       - checkout
-      - run: curl https://glide.sh/get | sh
-      - run: glide install
+      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - run: dep ensure
       - run: goreleaser
 
 workflows:
