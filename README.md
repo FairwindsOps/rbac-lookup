@@ -77,7 +77,7 @@ User/rob@example.com      project-wide      IAM/gke-developer   IAMRole/containe
 User/rob@example.com      project-wide      IAM/gcp-viewer      IAMRole/viewer
 ```
 
-At this point this integration only supports standard IAM roles, and is not advanced enough to include any custom roles. For a full list of supported roles and how they are mapped, view `lookup/gke_roles.go`.
+At this point this integration only supports standard IAM roles, and is not advanced enough to include any custom roles. For a full list of supported roles and how they are mapped, view [lookup/gke_roles.go](lookup/gke_roles.go).
 
 ### Kubernetes Configuration
 If a `KUBECONFIG` environment variable is specified, rbac-lookup will attempt to use the config at that path, otherwise it will default to `~/.kube/config`.
