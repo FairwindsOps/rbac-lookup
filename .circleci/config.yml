@@ -5,11 +5,12 @@ jobs:
 
     docker:
       - image: circleci/golang:1.11
+        environment:
+          GO111MODULE: "on"
 
     steps:
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: dep ensure
+      - run: go mod download && go mod verify
       - run: go test -v ./lookup/...
 
   release:
@@ -17,11 +18,12 @@ jobs:
 
     docker:
       - image: goreleaser/goreleaser
+        environment:
+          GO111MODULE: "on"
 
     steps:
       - checkout
-      - run: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      - run: dep ensure
+      - run: go mod download && go mod verify
       - run: goreleaser
 
 workflows:
