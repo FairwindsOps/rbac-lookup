@@ -11,6 +11,11 @@ This is a simple project that allows you to easily find Kubernetes roles and clu
 brew install reactiveops/tap/rbac-lookup
 ```
 
+### Krew
+```
+kubectl krew install rbac-lookup
+```
+
 ## Usage
 
 In the simplest use case, rbac-lookup will return any matching user, service account, or group along with the roles it has been given.
@@ -81,6 +86,9 @@ At this point this integration only supports standard IAM roles, and is not adva
 
 ### Kubernetes Configuration
 If a `KUBECONFIG` environment variable is specified, rbac-lookup will attempt to use the config at that path, otherwise it will default to `~/.kube/config`.
+
+## RBAC Manager
+While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/reactiveops/rbac-lookup).
 
 ## License
 Apache License 2.0
