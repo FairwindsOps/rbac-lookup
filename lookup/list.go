@@ -26,6 +26,8 @@ import (
 
 	// Required for GKE Auth
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	// Required for dex / oidc
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 )
 
 type clusterInfo struct {
