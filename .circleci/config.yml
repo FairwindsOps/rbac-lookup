@@ -1,4 +1,14 @@
 version: 2
+
+references:
+  install_goreleaser: &install_goreleaser
+    run:
+      name: Install GoReleaser
+      command: |
+        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.94.0/goreleaser_amd64.deb
+        echo "8dbad6683d6fc9367e637e6eed8e01a0d63c9660  goreleaser.deb" | sha1sum -c
+        sudo dpkg -i goreleaser.deb
+
 jobs:
   build:
     working_directory: /go/src/github.com/reactiveops/rbac-lookup
@@ -17,13 +27,14 @@ jobs:
     working_directory: /go/src/github.com/reactiveops/rbac-lookup
 
     docker:
-      - image: goreleaser/goreleaser
+      - image: circleci/golang:1.11
         environment:
           GO111MODULE: "on"
 
     steps:
       - checkout
       - run: go mod download && go mod verify
+      - *install_goreleaser
       - run: goreleaser
 
 workflows:
