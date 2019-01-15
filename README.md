@@ -88,7 +88,7 @@ At this point this integration only supports standard IAM roles, and is not adva
 If a `KUBECONFIG` environment variable is specified, rbac-lookup will attempt to use the config at that path, otherwise it will default to `~/.kube/config`.
 
 ## RBAC Manager
-While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/reactiveops/rbac-lookup).
+While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/reactiveops/rbac-manager).
 
 ## License
 Apache License 2.0
