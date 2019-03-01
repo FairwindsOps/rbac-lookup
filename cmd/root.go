@@ -45,9 +45,9 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format (normal,wide)")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format (normal, wide)")
 	rootCmd.PersistentFlags().StringVarP(&kubeContext, "context", "", "", "context to use for Kubernetes config")
-	rootCmd.PersistentFlags().StringVarP(&subjectKind, "kind", "k", "", "filter by this RBAC subject type")
+	rootCmd.PersistentFlags().StringVarP(&subjectKind, "kind", "k", "", "filter by this RBAC subject kind (user, group, serviceaccount)")
 	rootCmd.PersistentFlags().BoolVar(&enableGke, "gke", false, "enable GKE integration")
 }
 
