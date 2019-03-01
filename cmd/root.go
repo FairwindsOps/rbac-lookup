@@ -17,13 +17,16 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/reactiveops/rbac-lookup/lookup"
 	"github.com/spf13/cobra"
 )
 
-var output string
-var gke bool
+var outputFormat string
+var enableGke bool
+var kubeContext string
+var subjectKind string
 
 var rootCmd = &cobra.Command{
 	Use:   "rbac-lookup [subject query]",
@@ -32,16 +35,20 @@ var rootCmd = &cobra.Command{
 	Args:  cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := cmd.ParseFlags(args); err != nil {
-			fmt.Printf("Error parsing flags: %v", err)
+			fmt.Printf("Error parsing flags: %v\n", err)
 		}
 
-		lookup.List(args, output, gke)
+		subjectKind = strings.ToLower(subjectKind)
+
+		lookup.List(args, kubeContext, outputFormat, subjectKind, enableGke)
 	},
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output format (normal,wide)")
-	rootCmd.PersistentFlags().BoolVar(&gke, "gke", false, "enable GKE integration")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format (normal, wide)")
+	rootCmd.PersistentFlags().StringVarP(&kubeContext, "context", "", "", "context to use for Kubernetes config")
+	rootCmd.PersistentFlags().StringVarP(&subjectKind, "kind", "k", "", "filter by this RBAC subject kind (user, group, serviceaccount)")
+	rootCmd.PersistentFlags().BoolVar(&enableGke, "gke", false, "enable GKE integration")
 }
 
 // Execute is the primary entrypoint for this CLI

@@ -37,6 +37,7 @@ type lister struct {
 	clientset           kubernetes.Interface
 	filter              string
 	gkeProjectName      string
+	subjectKind         string
 	rbacSubjectsByScope map[string]rbacSubject
 }
 
@@ -109,7 +110,7 @@ func (l *lister) loadRoleBindings() error {
 
 	for _, roleBinding := range roleBindings.Items {
 		for _, subject := range roleBinding.Subjects {
-			if l.filter == "" || strings.Contains(subject.Name, l.filter) {
+			if l.nameMatches(subject.Name) && l.kindMatches(subject.Kind) {
 				if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
 					rbacSubj.addRoleBinding(&roleBinding)
 				} else {
@@ -136,7 +137,7 @@ func (l *lister) loadClusterRoleBindings() error {
 
 	for _, clusterRoleBinding := range clusterRoleBindings.Items {
 		for _, subject := range clusterRoleBinding.Subjects {
-			if l.filter == "" || strings.Contains(subject.Name, l.filter) {
+			if l.nameMatches(subject.Name) && l.kindMatches(subject.Kind) {
 				if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
 					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
 				} else {
@@ -161,7 +162,7 @@ func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 				s := strings.Split(member, ":")
 				memberKind := strings.Title(s[0])
 				memberName := s[1]
-				if l.filter == "" || strings.Contains(memberName, l.filter) {
+				if l.nameMatches(memberName) && l.kindMatches(memberKind) {
 					rbacSubj, exist := l.rbacSubjectsByScope[memberName]
 					if !exist {
 						rbacSubj = rbacSubject{
@@ -202,4 +203,18 @@ func (l *lister) loadGkeRoleBindings() error {
 	l.loadGkeIamPolicy(policy)
 
 	return nil
+}
+
+func (l *lister) nameMatches(name string) bool {
+	return l.filter == "" || strings.Contains(name, l.filter)
+}
+
+func (l *lister) kindMatches(kind string) bool {
+	if l.subjectKind == "" {
+		return true
+	}
+
+	lowerKind := strings.ToLower(kind)
+
+	return lowerKind == l.subjectKind
 }
