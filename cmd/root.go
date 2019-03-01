@@ -22,8 +22,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var output string
-var gke bool
+var outputFormat string
+var enableGke bool
+var kubeContext string
+var subjectType string
 
 var rootCmd = &cobra.Command{
 	Use:   "rbac-lookup [subject query]",
@@ -35,13 +37,15 @@ var rootCmd = &cobra.Command{
 			fmt.Printf("Error parsing flags: %v", err)
 		}
 
-		lookup.List(args, output, gke)
+		lookup.List(args, kubeContext, outputFormat, subjectType, enableGke)
 	},
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output format (normal,wide)")
-	rootCmd.PersistentFlags().BoolVar(&gke, "gke", false, "enable GKE integration")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format (normal,wide)")
+	rootCmd.PersistentFlags().StringVarP(&kubeContext, "context", "", "", "context to use for Kubernetes config")
+	rootCmd.PersistentFlags().StringVarP(&subjectType, "type", "t", "", "filter by this RBAC subject type")
+	rootCmd.PersistentFlags().BoolVar(&enableGke, "gke", false, "enable GKE integration")
 }
 
 // Execute is the primary entrypoint for this CLI

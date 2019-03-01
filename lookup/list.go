@@ -15,19 +15,16 @@
 package lookup
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	// Required for GKE Auth
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	// Required for dex / oidc
-	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	// Required for GKE, OIDC, and more
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 type clusterInfo struct {
@@ -37,11 +34,19 @@ type clusterInfo struct {
 }
 
 // List outputs rbac bindings where subject names match given string
-func List(args []string, outputFormat string, enableGke bool) {
-	kubeconfig := getKubeConfig()
-	clientset, err := getClientSet(kubeconfig)
+func List(args []string, kubeContext, outputFormat, subjectType string, enableGke bool) {
+	clientConfig := getClientConfig(kubeContext)
+
+	kubeconfig, err := clientConfig.ClientConfig()
 	if err != nil {
-		panic(err.Error())
+		fmt.Printf("Error getting Kubernetes config: %v\n", err)
+		os.Exit(1)
+	}
+
+	clientset, err := kubernetes.NewForConfig(kubeconfig)
+	if err != nil {
+		fmt.Printf("Error generating Kubernetes clientset from kubeconfig: %v\n", err)
+		os.Exit(2)
 	}
 
 	filter := ""
@@ -56,8 +61,18 @@ func List(args []string, outputFormat string, enableGke bool) {
 	}
 
 	if enableGke {
-		ci := getClusterInfo(kubeconfig)
-		l.gkeProjectName = ci.GkeProjectName
+		rawConfig, err := clientConfig.RawConfig()
+		if err != nil {
+			fmt.Printf("Error getting Kubernetes raw config: %v\n", err)
+			os.Exit(2)
+		}
+
+		ci := getClusterInfo(&rawConfig, kubeContext)
+		if ci.GkeProjectName == "" {
+			fmt.Printf("Error parsing GKE project name from kubeconfig")
+		} else {
+			l.gkeProjectName = ci.GkeProjectName
+		}
 	}
 
 	loadErr := l.loadAll()
@@ -69,35 +84,21 @@ func List(args []string, outputFormat string, enableGke bool) {
 	l.printRbacBindings(outputFormat)
 }
 
-func getKubeConfig() string {
-	var kubeconfig string
-	if os.Getenv("KUBECONFIG") != "" {
-		kubeconfig = os.Getenv("KUBECONFIG")
-	} else if home := homeDir(); home != "" {
-		kubeconfig = filepath.Join(home, ".kube", "config")
-	} else {
-		fmt.Println("Parsing kubeconfig failed, please set KUBECONFIG env var")
-		os.Exit(1)
-	}
-
-	if _, err := os.Stat(kubeconfig); err != nil {
-		// kubeconfig doesn't exist
-		fmt.Printf("%s does not exist - please make sure you have a kubeconfig configured.\n", kubeconfig)
-		panic(err.Error())
-	}
-
-	return kubeconfig
+func getClientConfig(kubeContext string) clientcmd.ClientConfig {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		clientcmd.NewDefaultClientConfigLoadingRules(),
+		&clientcmd.ConfigOverrides{CurrentContext: kubeContext},
+	)
 }
 
-func getClusterInfo(kubeconfig string) *clusterInfo {
-	c, err := clientcmd.LoadFromFile(kubeconfig)
-	if err != nil {
-		panic(err.Error())
+func getClusterInfo(c *clientcmdapi.Config, kubeContext string) *clusterInfo {
+	context := c.Contexts[c.CurrentContext]
+	if kubeContext != "" {
+		context = c.Contexts[kubeContext]
 	}
 
-	currentContext := c.Contexts[c.CurrentContext]
-	if currentContext.Cluster != "" {
-		s := strings.Split(currentContext.Cluster, "_")
+	if context.Cluster != "" {
+		s := strings.Split(context.Cluster, "_")
 		if s[0] == "gke" {
 			return &clusterInfo{
 				ClusterName:    s[3],
@@ -106,24 +107,6 @@ func getClusterInfo(kubeconfig string) *clusterInfo {
 			}
 		}
 	}
+
 	return &clusterInfo{}
-}
-
-func getClientSet(kubeconfig string) (*kubernetes.Clientset, error) {
-	flag.Parse()
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	// create the clientset
-	return kubernetes.NewForConfig(config)
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }
