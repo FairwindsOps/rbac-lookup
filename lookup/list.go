@@ -34,7 +34,7 @@ type clusterInfo struct {
 }
 
 // List outputs rbac bindings where subject names match given string
-func List(args []string, kubeContext, outputFormat, subjectType string, enableGke bool) {
+func List(args []string, kubeContext, outputFormat, subjectKind string, enableGke bool) {
 	clientConfig := getClientConfig(kubeContext)
 
 	kubeconfig, err := clientConfig.ClientConfig()
@@ -56,6 +56,7 @@ func List(args []string, kubeContext, outputFormat, subjectType string, enableGk
 
 	l := lister{
 		filter:              filter,
+		subjectKind:         subjectKind,
 		clientset:           clientset,
 		rbacSubjectsByScope: make(map[string]rbacSubject),
 	}
@@ -64,12 +65,12 @@ func List(args []string, kubeContext, outputFormat, subjectType string, enableGk
 		rawConfig, err := clientConfig.RawConfig()
 		if err != nil {
 			fmt.Printf("Error getting Kubernetes raw config: %v\n", err)
-			os.Exit(2)
+			os.Exit(3)
 		}
 
 		ci := getClusterInfo(&rawConfig, kubeContext)
 		if ci.GkeProjectName == "" {
-			fmt.Printf("Error parsing GKE project name from kubeconfig")
+			fmt.Printf("Error parsing GKE project name from kubeconfig\n")
 		} else {
 			l.gkeProjectName = ci.GkeProjectName
 		}
@@ -77,8 +78,8 @@ func List(args []string, kubeContext, outputFormat, subjectType string, enableGk
 
 	loadErr := l.loadAll()
 	if loadErr != nil {
-		fmt.Printf("Error loading RBAC: %v\n", loadErr)
-		os.Exit(1)
+		fmt.Printf("Error loading RBAC Bindings: %v\n", loadErr)
+		os.Exit(4)
 	}
 
 	l.printRbacBindings(outputFormat)
