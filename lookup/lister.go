@@ -105,6 +105,7 @@ func (l *lister) loadRoleBindings() error {
 	roleBindings, err := l.clientset.RbacV1().RoleBindings("").List(metav1.ListOptions{})
 
 	if err != nil {
+		fmt.Println("Error loading role bindings")
 		return err
 	}
 
@@ -132,6 +133,7 @@ func (l *lister) loadClusterRoleBindings() error {
 	clusterRoleBindings, err := l.clientset.RbacV1().ClusterRoleBindings().List(metav1.ListOptions{})
 
 	if err != nil {
+		fmt.Println("Error loading cluster role bindings")
 		return err
 	}
 
@@ -182,13 +184,15 @@ func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 func (l *lister) loadGkeRoleBindings() error {
 	ctx := context.Background()
 
-	c, err := google.DefaultClient(ctx, cloudresourcemanager.CloudPlatformScope)
+	c, err := google.DefaultClient(ctx, cloudresourcemanager.CloudPlatformReadOnlyScope)
 	if err != nil {
+		fmt.Println("Error initializing Google API client")
 		return err
 	}
 
 	crmService, err := cloudresourcemanager.New(c)
 	if err != nil {
+		fmt.Println("Error initializing Google Cloud Resource Manager")
 		return err
 	}
 
@@ -197,6 +201,7 @@ func (l *lister) loadGkeRoleBindings() error {
 
 	policy, err := crmService.Projects.GetIamPolicy(resource, ipr).Context(ctx).Do()
 	if err != nil {
+		fmt.Printf("Error loading Google Cloud IAM Policy for project: %s\n", resource)
 		return err
 	}
 
