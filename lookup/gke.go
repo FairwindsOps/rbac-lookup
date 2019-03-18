@@ -44,7 +44,7 @@ func getClusterInfo(c *clientcmdapi.Config, kubeContext string) *gkeClusterInfo 
 
 	ci := gkeClusterInfo{}
 
-	if context.Cluster != "" {
+	if context != nil && context.Cluster != "" {
 		s := strings.Split(context.Cluster, "_")
 		if s[0] == "gke" {
 			ci.ClusterName = s[3]
