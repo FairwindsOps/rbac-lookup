@@ -17,21 +17,13 @@ package lookup
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
 	// Required for GKE, OIDC, and more
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
-
-type clusterInfo struct {
-	ClusterName    string
-	GkeZone        string
-	GkeProjectName string
-}
 
 // List outputs rbac bindings where subject names match given string
 func List(args []string, kubeContext, outputFormat, subjectKind string, enableGke bool) {
@@ -69,11 +61,7 @@ func List(args []string, kubeContext, outputFormat, subjectKind string, enableGk
 		}
 
 		ci := getClusterInfo(&rawConfig, kubeContext)
-		if ci.GkeProjectName == "" {
-			fmt.Printf("Error parsing GKE project name from kubeconfig\n")
-		} else {
-			l.gkeProjectName = ci.GkeProjectName
-		}
+		l.gkeParsedProjectName = ci.ParsedProjectName
 	}
 
 	loadErr := l.loadAll()
@@ -90,24 +78,4 @@ func getClientConfig(kubeContext string) clientcmd.ClientConfig {
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{CurrentContext: kubeContext},
 	)
-}
-
-func getClusterInfo(c *clientcmdapi.Config, kubeContext string) *clusterInfo {
-	context := c.Contexts[c.CurrentContext]
-	if kubeContext != "" {
-		context = c.Contexts[kubeContext]
-	}
-
-	if context.Cluster != "" {
-		s := strings.Split(context.Cluster, "_")
-		if s[0] == "gke" {
-			return &clusterInfo{
-				ClusterName:    s[3],
-				GkeZone:        s[2],
-				GkeProjectName: s[1],
-			}
-		}
-	}
-
-	return &clusterInfo{}
 }

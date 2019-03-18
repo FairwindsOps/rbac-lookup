@@ -21,8 +21,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/cloudresourcemanager/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,11 +32,11 @@ import (
 )
 
 type lister struct {
-	clientset           kubernetes.Interface
-	filter              string
-	gkeProjectName      string
-	subjectKind         string
-	rbacSubjectsByScope map[string]rbacSubject
+	clientset            kubernetes.Interface
+	filter               string
+	gkeParsedProjectName string
+	subjectKind          string
+	rbacSubjectsByScope  map[string]rbacSubject
 }
 
 func (l *lister) loadAll() error {
@@ -54,12 +52,14 @@ func (l *lister) loadAll() error {
 		return crbErr
 	}
 
-	if l.gkeProjectName != "" {
-		gkeErr := l.loadGkeRoleBindings()
+	if l.gkeParsedProjectName != "" {
+		policy, gkeErr := loadGkeIAMPolicy(l.gkeParsedProjectName)
 
 		if gkeErr != nil {
 			return gkeErr
 		}
+
+		l.loadGkeIamPolicy(policy)
 	}
 
 	return nil
@@ -179,35 +179,6 @@ func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 			}
 		}
 	}
-}
-
-func (l *lister) loadGkeRoleBindings() error {
-	ctx := context.Background()
-
-	c, err := google.DefaultClient(ctx, cloudresourcemanager.CloudPlatformReadOnlyScope)
-	if err != nil {
-		fmt.Println("Error initializing Google API client")
-		return err
-	}
-
-	crmService, err := cloudresourcemanager.New(c)
-	if err != nil {
-		fmt.Println("Error initializing Google Cloud Resource Manager")
-		return err
-	}
-
-	resource := l.gkeProjectName
-	ipr := &cloudresourcemanager.GetIamPolicyRequest{}
-
-	policy, err := crmService.Projects.GetIamPolicy(resource, ipr).Context(ctx).Do()
-	if err != nil {
-		fmt.Printf("Error loading Google Cloud IAM Policy for project: %s\n", resource)
-		return err
-	}
-
-	l.loadGkeIamPolicy(policy)
-
-	return nil
 }
 
 func (l *lister) nameMatches(name string) bool {
