@@ -30,7 +30,7 @@ rob@example.com           nginx-ingress     ClusterRole/edit
 The wide output option includes the kind of subject along with the source role binding.
 
 ```
-rbac-lookup ro --output wide
+rbac-lookup rob --output wide
 
 SUBJECT                   SCOPE             ROLE                SOURCE
 User/rob@example.com      cluster-wide      ClusterRole/view    ClusterRoleBinding/rob-cluster-view
