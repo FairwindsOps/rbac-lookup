@@ -21,7 +21,8 @@ jobs:
     steps:
       - checkout
       - run: go mod download && go mod verify
-      - run: go test -v ./lookup/...
+      - run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
+      - run: bash <(curl -s https://codecov.io/bash)
 
   release:
     working_directory: /go/src/github.com/reactiveops/rbac-lookup

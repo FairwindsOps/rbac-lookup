@@ -1,6 +1,6 @@
 # rbac-lookup
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/reactiveops/rbac-lookup)](https://goreportcard.com/report/github.com/reactiveops/rbac-lookup) [![CircleCI](https://circleci.com/gh/reactiveops/rbac-lookup.svg?style=svg)](https://circleci.com/gh/reactiveops/rbac-lookup)
+[![Go Report Card](https://goreportcard.com/badge/github.com/reactiveops/rbac-lookup)](https://goreportcard.com/report/github.com/reactiveops/rbac-lookup) [![CircleCI](https://circleci.com/gh/reactiveops/rbac-lookup.svg?style=svg)](https://circleci.com/gh/reactiveops/rbac-lookup) [![codecov](https://codecov.io/gh/reactiveops/rbac-lookup/branch/master/graph/badge.svg)](https://codecov.io/gh/reactiveops/rbac-lookup)
 
 This is a simple project that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
 
