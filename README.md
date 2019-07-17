@@ -92,5 +92,10 @@ At this point this integration only supports standard IAM roles, and is not adva
 ## RBAC Manager
 While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/reactiveops/rbac-manager).
 
+## Contributing
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Roadmap](ROADMAP.md)
+- [Changelog](https://github.com/FairwindsOps/rbac-lookup/releases)
+
 ## License
 Apache License 2.0
