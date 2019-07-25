@@ -22,7 +22,7 @@ changelog:
     - '^test:'
 brew:
   github:
-    owner: fairwinds
+    owner: FairwindsOps
     name: homebrew-tap
   folder: Formula
   description: Reverse Lookup for Kubernetes RBAC

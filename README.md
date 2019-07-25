@@ -10,7 +10,7 @@ This is a simple project that allows you to easily find Kubernetes roles and clu
 
 ### Homebrew
 ```
-brew install fairwinds/tap/rbac-lookup
+brew install FairwindsOps/tap/rbac-lookup
 ```
 
 ### Krew
