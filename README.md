@@ -1,16 +1,16 @@
 # rbac-lookup
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/reactiveops/rbac-lookup)](https://goreportcard.com/report/github.com/reactiveops/rbac-lookup) [![CircleCI](https://circleci.com/gh/reactiveops/rbac-lookup.svg?style=svg)](https://circleci.com/gh/reactiveops/rbac-lookup) [![codecov](https://codecov.io/gh/reactiveops/rbac-lookup/branch/master/graph/badge.svg)](https://codecov.io/gh/reactiveops/rbac-lookup)
+[![Go Report Card](https://goreportcard.com/badge/github.com/FairwindsOps/rbac-lookup)](https://goreportcard.com/report/github.com/FairwindsOps/rbac-lookup) [![CircleCI](https://circleci.com/gh/FairwindsOps/rbac-lookup.svg?style=svg)](https://circleci.com/gh/FairwindsOps/rbac-lookup) [![codecov](https://codecov.io/gh/FairwindsOps/rbac-lookup/branch/master/graph/badge.svg)](https://codecov.io/gh/FairwindsOps/rbac-lookup)
 
 This is a simple project that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
 
-**Want to learn more?** ReactiveOps holds [office hours on Zoom](https://zoom.us/j/242508205) the first Friday of every month, at 12pm Eastern. You can also reach out via email at `opensource@fairwinds.com`
+**Want to learn more?** Fairwinds holds [office hours on Zoom](https://zoom.us/j/242508205) the first Friday of every month, at 12pm Eastern. You can also reach out via email at `opensource@fairwinds.com`
 
 ## Installation
 
 ### Homebrew
 ```
-brew install reactiveops/tap/rbac-lookup
+brew install fairwinds/tap/rbac-lookup
 ```
 
 ### Krew
@@ -90,7 +90,7 @@ At this point this integration only supports standard IAM roles, and is not adva
 ```
 
 ## RBAC Manager
-While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/reactiveops/rbac-manager).
+While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/FairwindsOps/rbac-manager).
 
 ## Contributing
 - [Code of Conduct](CODE_OF_CONDUCT.md)
