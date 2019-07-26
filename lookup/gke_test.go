@@ -1,4 +1,4 @@
-// Copyright 2018 ReactiveOps
+// Copyright 2018 FairwindsOps Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ func TestGetClusterInfo(t *testing.T) {
 				Cluster: "helloworld",
 			},
 			"actual-gke": {
-				Cluster: "gke_reactiveopsio_us-central1-a_rbac-lookup-testing",
+				Cluster: "gke_fairwindsio_us-central1-a_rbac-lookup-testing",
 			},
 		},
 		CurrentContext: "bar",

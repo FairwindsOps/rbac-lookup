@@ -11,7 +11,7 @@ references:
 
 jobs:
   build:
-    working_directory: /go/src/github.com/reactiveops/rbac-lookup
+    working_directory: /go/src/github.com/fairwindsops/rbac-lookup
 
     docker:
       - image: circleci/golang:1.11
@@ -25,7 +25,7 @@ jobs:
       - run: bash <(curl -s https://codecov.io/bash)
 
   release:
-    working_directory: /go/src/github.com/reactiveops/rbac-lookup
+    working_directory: /go/src/github.com/fairwindsops/rbac-lookup
 
     docker:
       - image: circleci/golang:1.11
