@@ -9,3 +9,5 @@ go.sum
 cover-report.html
 coverage.txt
 cover.html
+
+rbac-lookup
