@@ -120,7 +120,11 @@ func (l *lister) loadRoleBindings() error {
 						RolesByScope: make(map[string][]simpleRole),
 					}
 					rbacSubj.addRoleBinding(&roleBinding)
-					l.rbacSubjectsByScope[subject.Name] = rbacSubj
+					subjectKey := subject.Name
+					if rbacSubj.Kind == "ServiceAccount" {
+						subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
+					}
+					l.rbacSubjectsByScope[subjectKey] = rbacSubj
 				}
 			}
 		}
@@ -148,7 +152,11 @@ func (l *lister) loadClusterRoleBindings() error {
 						RolesByScope: make(map[string][]simpleRole),
 					}
 					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
-					l.rbacSubjectsByScope[subject.Name] = rbacSubj
+					subjectKey := subject.Name
+					if rbacSubj.Kind == "ServiceAccount" {
+						subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
+					}
+					l.rbacSubjectsByScope[subjectKey] = rbacSubj
 				}
 			}
 		}
