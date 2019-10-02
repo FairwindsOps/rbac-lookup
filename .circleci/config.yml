@@ -44,8 +44,6 @@ workflows:
             branches:
               only: /.*/
       - release:
-          requires:
-            - test
           filters:
             branches:
               ignore: /.*/
