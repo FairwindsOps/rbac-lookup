@@ -10,14 +10,13 @@ references:
         sudo dpkg -i goreleaser.deb
 
 jobs:
-  build:
+  test:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
 
     docker:
       - image: circleci/golang:1.11
         environment:
           GO111MODULE: "on"
-
     steps:
       - checkout
       - run: go mod download && go mod verify
@@ -26,12 +25,10 @@ jobs:
 
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
-
     docker:
       - image: circleci/golang:1.11
         environment:
           GO111MODULE: "on"
-
     steps:
       - checkout
       - run: go mod download && go mod verify
@@ -40,15 +37,15 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  test-and-release:
     jobs:
-      - build:
+      - test:
           filters:
             branches:
               only: /.*/
-  release:
-    jobs:
       - release:
+          requires:
+            - test
           filters:
             branches:
               ignore: /.*/
