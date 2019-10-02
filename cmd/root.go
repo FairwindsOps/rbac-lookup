@@ -23,10 +23,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var outputFormat string
-var enableGke bool
-var kubeContext string
-var subjectKind string
+var (
+	version      string
+	commit       string
+	outputFormat string
+	enableGke    bool
+	kubeContext  string
+	subjectKind  string
+)
 
 var rootCmd = &cobra.Command{
 	Use:   "rbac-lookup [subject query]",
@@ -52,7 +56,9 @@ func init() {
 }
 
 // Execute is the primary entrypoint for this CLI
-func Execute() {
+func Execute(VERSION string, COMMIT string) {
+	version = VERSION
+	commit = COMMIT
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
