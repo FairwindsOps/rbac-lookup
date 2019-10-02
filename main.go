@@ -18,6 +18,13 @@ import (
 	"github.com/fairwindsops/rbac-lookup/cmd"
 )
 
+var (
+	// version is set during build
+	version = ""
+	// COMMIT is set during build
+	commit = "n/a"
+)
+
 func main() {
-	cmd.Execute()
+	cmd.Execute(version, commit)
 }

@@ -24,7 +24,6 @@ clean:
 	$(GOCLEAN)
 	$(GOCMD) fmt ./...
 	rm -f $(BINARY_NAME)
-	packr2 clean
 # Cross compilation
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME) -ldflags "-X main.VERSION=$(VERSION)" -v
