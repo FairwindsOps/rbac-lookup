@@ -28,6 +28,7 @@ var (
 	commit       string
 	outputFormat string
 	enableGke    bool
+	kubeConfig   string
 	kubeContext  string
 	subjectKind  string
 )
@@ -44,12 +45,13 @@ var rootCmd = &cobra.Command{
 
 		subjectKind = strings.ToLower(subjectKind)
 
-		lookup.List(args, kubeContext, outputFormat, subjectKind, enableGke)
+		lookup.List(args, kubeConfig, kubeContext, outputFormat, subjectKind, enableGke)
 	},
 }
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format (normal, wide)")
+	rootCmd.PersistentFlags().StringVarP(&kubeConfig, "kubeconfig", "", "", "config file location")
 	rootCmd.PersistentFlags().StringVarP(&kubeContext, "context", "", "", "context to use for Kubernetes config")
 	rootCmd.PersistentFlags().StringVarP(&subjectKind, "kind", "k", "", "filter by this RBAC subject kind (user, group, serviceaccount)")
 	rootCmd.PersistentFlags().BoolVar(&enableGke, "gke", false, "enable GKE integration")

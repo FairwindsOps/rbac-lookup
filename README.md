@@ -85,11 +85,12 @@ At this point this integration only supports standard IAM roles, and is not adva
 
 ## Flags Supported
 ```
-      --context string   context to use for Kubernetes config
-      --gke              enable GKE integration
-  -h, --help             help for rbac-lookup
-  -k, --kind string      filter by this RBAC subject kind (user, group, serviceaccount)
-  -o, --output string    output format (normal, wide)
+      --context string      context to use for Kubernetes config
+      --gke                 enable GKE integration
+  -h, --help                help for rbac-lookup
+  -k, --kind string         filter by this RBAC subject kind (user, group, serviceaccount)
+      --kubeconfig string   config file location
+  -o, --output string       output format (normal, wide)
 ```
 
 ## RBAC Manager
