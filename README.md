@@ -1,8 +1,11 @@
-# rbac-lookup
+<div align="center">
+  <img src="/img/logo.svg" height="200" alt="RBAC Lookup" style="padding-bottom: 20px" />
+  <br><br>
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/FairwindsOps/rbac-lookup)](https://goreportcard.com/report/github.com/FairwindsOps/rbac-lookup) [![CircleCI](https://circleci.com/gh/FairwindsOps/rbac-lookup.svg?style=svg)](https://circleci.com/gh/FairwindsOps/rbac-lookup) [![codecov](https://codecov.io/gh/FairwindsOps/rbac-lookup/branch/master/graph/badge.svg)](https://codecov.io/gh/FairwindsOps/rbac-lookup)
+  [![Go Report Card](https://goreportcard.com/badge/github.com/FairwindsOps/rbac-lookup)](https://goreportcard.com/report/github.com/FairwindsOps/rbac-lookup) [![CircleCI](https://circleci.com/gh/FairwindsOps/rbac-lookup.svg?style=svg)](https://circleci.com/gh/FairwindsOps/rbac-lookup) [![codecov](https://codecov.io/gh/FairwindsOps/rbac-lookup/branch/master/graph/badge.svg)](https://codecov.io/gh/FairwindsOps/rbac-lookup)
+</div>
 
-This is a simple project that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
+RBAC Lookup is a CLI that allows you to easily find Kubernetes roles and cluster roles bound to any user, service account, or group name. Binaries are generated with goreleaser for each release for simple installation.
 
 **Want to learn more?** Fairwinds holds [office hours on Zoom](https://zoom.us/j/242508205) the first Friday of every month, at 12pm Eastern. You can also reach out via email at `opensource@fairwinds.com`
 
