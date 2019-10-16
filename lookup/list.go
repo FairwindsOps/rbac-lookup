@@ -26,8 +26,9 @@ import (
 )
 
 // List outputs rbac bindings where subject names match given string
-func List(args []string, kubeContext, outputFormat, subjectKind string, enableGke bool) {
-	clientConfig := getClientConfig(kubeContext)
+func List(args []string, kubeConfig, kubeContext, outputFormat, subjectKind string, enableGke bool) {
+
+	clientConfig := getClientConfig(kubeConfig, kubeContext)
 
 	kubeconfig, err := clientConfig.ClientConfig()
 	if err != nil {
@@ -73,9 +74,11 @@ func List(args []string, kubeContext, outputFormat, subjectKind string, enableGk
 	l.printRbacBindings(outputFormat)
 }
 
-func getClientConfig(kubeContext string) clientcmd.ClientConfig {
+func getClientConfig(kubeConfig, kubeContext string) clientcmd.ClientConfig {
+	configRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	configRules.ExplicitPath = kubeConfig
 	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
+		configRules,
 		&clientcmd.ConfigOverrides{CurrentContext: kubeContext},
 	)
 }
