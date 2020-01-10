@@ -52,7 +52,6 @@ workflows:
           script: e2e/test.sh
           requires:
             - test
-            - build
           filters:
             branches:
               only: mh/e2e-testing
