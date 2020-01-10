@@ -9,6 +9,11 @@ else
     echo "CI_SHA1: $CI_SHA1"
 fi
 
-/sbin/apk add go=1.12.12-r0
-/usr/bin/go build -o ./rbac-lookup
+curl -O https://storage.googleapis.com/golang/go1.12.9.linux-amd64.tar.gz
+tar -xvf go1.12.9.linux-amd64.tar.gz
+chown -R root:root ./go
+mv go /usr/local
+
+
+/usr/local/go/bin/go build -o ./rbac-lookup
 docker cp ./rbac-lookup e2e-command-runner:rbac-lookup
