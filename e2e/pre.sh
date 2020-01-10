@@ -15,5 +15,5 @@ chown -R root:root ./go
 mv go /usr/local
 
 
-/usr/local/go/bin/go build -o ./rbac-lookup
+GO111MODULE=on /usr/local/go/bin/go build -o ./rbac-lookup
 docker cp ./rbac-lookup e2e-command-runner:rbac-lookup
