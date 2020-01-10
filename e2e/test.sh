@@ -26,7 +26,7 @@ echo "** Test rbac-lookup **"
 echo "********************************************************************"
 printf "\n\n"
 ls -al /usr/local/bin/
-chmod+x /usr/local/bin/rbac-lookup
+chmod +x /usr/local/bin/rbac-lookup
 /usr/local/bin/rbac-lookup "rbac-lookup" --kind service | grep "ClusterRole/test-rbac-lookup"
 
 if [ $? != 0 ]; then
