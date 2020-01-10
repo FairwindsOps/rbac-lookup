@@ -16,4 +16,4 @@ mv go /usr/local
 
 
 GO111MODULE=on /usr/local/go/bin/go build -o ./rbac-lookup
-docker cp ./rbac-lookup e2e-command-runner:rbac-lookup
+docker cp ./rbac-lookup e2e-command-runner:/usr/local/bin/rbac-lookup
