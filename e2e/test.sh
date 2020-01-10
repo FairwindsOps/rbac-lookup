@@ -9,7 +9,7 @@ echo "**************************"
 printf "\n\n"
 
 set -e
-
+ls -al
 
 printf "\n\n"
 echo "********************************************************************"
@@ -26,7 +26,7 @@ echo "********************************************************************"
 echo "** Test rbac-lookup **"
 echo "********************************************************************"
 printf "\n\n"
-rbac-lookup rbac-lookup --kind service | grep "ClusterRole/test-rbac-lookup"
+./rbac-lookup rbac-lookup --kind service | grep "ClusterRole/test-rbac-lookup"
 
 if [ $? != 0 ]; then
   echo "Cluster Role not found.  Did rbac-lookup fail?"
