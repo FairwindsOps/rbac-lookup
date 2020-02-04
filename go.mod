@@ -3,7 +3,7 @@ module github.com/fairwindsops/rbac-lookup
 go 1.13
 
 require (
-	cloud.google.com/go v0.36.0
+	cloud.google.com/go v0.52.0
 	contrib.go.opencensus.io/exporter/ocagent v0.2.0
 	github.com/Azure/go-autorest v11.5.0+incompatible
 	github.com/census-instrumentation/opencensus-proto v0.1.0
