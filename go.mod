@@ -28,7 +28,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/testify v1.3.0
-	go.opencensus.io v0.18.0
+	go.opencensus.io v0.22.3
 	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
 	golang.org/x/net v0.0.0-20190228165749-92fc7df08ae7
 	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
