@@ -4,7 +4,7 @@ orbs:
   rok8s-scripts: fairwinds/rok8s-scripts@11
 
 executors:
-  golang12:
+  golang-exec:
     docker:
       - image: circleci/golang:1.13-stretch
 
@@ -19,7 +19,7 @@ references:
         rm goreleaser.deb
   e2e_config: &e2e_config
     command_runner_image: quay.io/reactiveops/ci-images:v11-stretch
-    executor: golang12
+    executor: golang-exec
     pre_script: e2e/pre.sh
     script: e2e/test.sh
     requires:
