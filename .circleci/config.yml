@@ -6,7 +6,7 @@ orbs:
 executors:
   golang12:
     docker:
-      - image: circleci/golang:1.12-stretch
+      - image: circleci/golang:1.13-stretch
 
 references:
   install_goreleaser: &install_goreleaser
@@ -35,7 +35,7 @@ jobs:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
 
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           GO111MODULE: "on"
     steps:
@@ -47,7 +47,7 @@ jobs:
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           GO111MODULE: "on"
     steps:
