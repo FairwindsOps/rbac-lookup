@@ -10,5 +10,5 @@ require (
 	google.golang.org/api v0.20.0
 	k8s.io/api v0.17.4
 	k8s.io/apimachinery v0.16.6
-	k8s.io/client-go v0.17.4
+	k8s.io/client-go v0.18.0
 )
