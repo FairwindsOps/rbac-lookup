@@ -79,7 +79,12 @@ workflows:
           name: e2e test kube 1.17.0
           kind_node_image: >-
             "kindest/node:v1.17.0@sha256:9512edae126da271b66b990b6fff768fbb7cd786c7d39e86bdf55906352fdf62"
-          <<: *e2e_config        
+          <<: *e2e_config
+      - rok8s-scripts/kubernetes_e2e_tests:
+          name: e2e test kube 1.18.0
+          kind_node_image: >-
+            "kindest/node:v1.18.0@sha256:0e20578828edd939d25eb98496a685c76c98d54084932f76069f886ec315d694"
+          <<: *e2e_config
       - release:
           filters:
             branches:
