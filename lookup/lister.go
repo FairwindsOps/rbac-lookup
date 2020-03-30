@@ -15,6 +15,7 @@
 package lookup
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -102,7 +103,7 @@ func (l *lister) printRbacBindings(outputFormat string) {
 }
 
 func (l *lister) loadRoleBindings() error {
-	roleBindings, err := l.clientset.RbacV1().RoleBindings("").List(metav1.ListOptions{})
+	roleBindings, err := l.clientset.RbacV1().RoleBindings("").List(context.Background(), metav1.ListOptions{})
 
 	if err != nil {
 		fmt.Println("Error loading role bindings")
@@ -134,7 +135,7 @@ func (l *lister) loadRoleBindings() error {
 }
 
 func (l *lister) loadClusterRoleBindings() error {
-	clusterRoleBindings, err := l.clientset.RbacV1().ClusterRoleBindings().List(metav1.ListOptions{})
+	clusterRoleBindings, err := l.clientset.RbacV1().ClusterRoleBindings().List(context.Background(), metav1.ListOptions{})
 
 	if err != nil {
 		fmt.Println("Error loading cluster role bindings")

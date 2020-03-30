@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
 
 	"google.golang.org/api/cloudresourcemanager/v1"
 
@@ -321,7 +322,7 @@ func createRoleBindings(t *testing.T, l lister) {
 	}}
 
 	for _, roleBinding := range roleBindings {
-		_, err := l.clientset.RbacV1().RoleBindings(roleBinding.Namespace).Create(&roleBinding)
+		_, err := l.clientset.RbacV1().RoleBindings(roleBinding.Namespace).Create(context.Background(), &roleBinding, metav1.CreateOptions{})
 		assert.Nil(t, err, "Expected no error creating role bindings")
 	}
 }
@@ -351,7 +352,7 @@ func createClusterRoleBindings(t *testing.T, l lister) {
 	}}
 
 	for _, clusterRoleBinding := range clusterRoleBindings {
-		_, err := l.clientset.RbacV1().ClusterRoleBindings().Create(&clusterRoleBinding)
+		_, err := l.clientset.RbacV1().ClusterRoleBindings().Create(context.Background(), &clusterRoleBinding, metav1.CreateOptions{})
 		assert.Nil(t, err, "Expected no error creating cluster role bindings")
 	}
 }
