@@ -28,8 +28,8 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 
-	// Required for GKE Auth
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	// Required for different auth providers like GKE, OIDC
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 type lister struct {
