@@ -11,8 +11,6 @@ all: test build
 build:
 	$(GOBUILD) -o $(BINARY_NAME) -ldflags "-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w" -v
 test:
-	printf "Linter:\n"
-	$(GOCMD) list ./... | xargs -L1 golint | tee golint-report.out
 	printf "\n\nTests:\n\n"
 	$(GOCMD) test -v --bench --benchmem -coverprofile coverage.txt -covermode=atomic ./...
 	$(GOCMD) vet ./... 2> govet-report.out
