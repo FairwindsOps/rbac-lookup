@@ -18,15 +18,19 @@ rbac-lookup is a relatively simple cobra cli tool that looks up information abou
 We label issues with the ["good first issue" tag](https://github.com/FairwindsOps/rbac-lookup/labels/good%20first%20issue) if we believe they'll be a good starting point for new contributors. If you're interested in working on an issue, please start a conversation on that issue, and we can help answer any questions as they come up.
 
 ## Setting Up Your Development Environment
+
 ### Prerequisites
-* A properly configured Golang environment with Go 1.11 or higher
+
+* A properly configured Golang environment with Go 1.13 or higher
 * Access to a cluster via a properly configured KUBECONFIG
 
 ### Installation
+
 * Install the project with `go get github.com/fairwindsops/rbac-lookup`
 * Change into the rbac-lookup directory which is installed at `$GOPATH/src/github.com/fairwindsops/rbac-lookup`
 * Use `make build` to build the binary locally.
-* Use `make tests` to run the tests and generate a coverage report.
+* Use `make test` to run the tests and generate a coverage report.
+* Use `make lint` to run [golangci-lint](https://github.com/golangci/golangci-lint) (requires golangci-lint installed)
 
 ## Creating a New Issue
 
