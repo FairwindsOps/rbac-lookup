@@ -8,3 +8,4 @@ coverage.txt
 cover.html
 
 /rbac-lookup
+/e2e/tests/rbac-lookup

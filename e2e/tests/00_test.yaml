@@ -9,10 +9,18 @@ testcases:
   - script: kubectl apply -f 00_assets/
 - name: Rbac Lookup
   steps:
-  - script: /rbac-lookup/rbac-lookup e2e-test
+  - script: ./rbac-lookup e2e-test
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldNotEqual "No RBAC Bindings found"
+- name: rbac lookup circleci
+  steps:
+  - script: ./rbac-lookup circleci -owide
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "ServiceAccount/circleci:circleci    two            ClusterRole/cluster-admin   RoleBinding/circleci-cluster-admin"
+    - result.systemout ShouldContainSubstring "ServiceAccount/circleci:circleci    cluster-wide   ClusterRole/cluster-admin   ClusterRoleBinding/circleci-cluster-admin"
+    - result.systemout ShouldContainSubstring "ServiceAccount/circleci:circleci    one            ClusterRole/cluster-admin   RoleBinding/circleci-cluster-admin"
 - name: Cleanup
   steps:
   - script: kubectl delete -f 00_assets/
