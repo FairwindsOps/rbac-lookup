@@ -36,8 +36,11 @@ type simpleRoleSource struct {
 
 func (rbacSubj *rbacSubject) addRoleBinding(roleBinding *rbacv1.RoleBinding) {
 	simpleRole := simpleRole{
-		Name:   roleBinding.RoleRef.Name,
-		Source: simpleRoleSource{Name: roleBinding.Name, Kind: "RoleBinding"},
+		Name: roleBinding.RoleRef.Name,
+		Source: simpleRoleSource{
+			Name: roleBinding.Name,
+			Kind: "RoleBinding",
+		},
 	}
 
 	simpleRole.Kind = roleBinding.RoleRef.Kind

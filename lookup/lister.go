@@ -113,7 +113,11 @@ func (l *lister) loadRoleBindings() error {
 	for _, roleBinding := range roleBindings.Items {
 		for _, subject := range roleBinding.Subjects {
 			if l.nameMatches(subject.Name) && l.kindMatches(subject.Kind) {
-				if rbacSubj, exist := l.rbacSubjectsByScope[subject.Name]; exist {
+				subjectKey := subject.Name
+				if subject.Kind == "ServiceAccount" {
+					subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
+				}
+				if rbacSubj, exist := l.rbacSubjectsByScope[subjectKey]; exist {
 					rbacSubj.addRoleBinding(&roleBinding)
 				} else {
 					rbacSubj := rbacSubject{
@@ -121,10 +125,7 @@ func (l *lister) loadRoleBindings() error {
 						RolesByScope: make(map[string][]simpleRole),
 					}
 					rbacSubj.addRoleBinding(&roleBinding)
-					subjectKey := subject.Name
-					if rbacSubj.Kind == "ServiceAccount" {
-						subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
-					}
+
 					l.rbacSubjectsByScope[subjectKey] = rbacSubj
 				}
 			}
