@@ -39,7 +39,7 @@ func TestLoadRoleBindings(t *testing.T) {
 
 	loadRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 2, "Expected 2 rbac subjects")
+	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -55,8 +55,31 @@ func TestLoadRoleBindings(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["joe"], expectedRbacSubject)
-	assert.EqualValues(t, l.rbacSubjectsByScope["sue"], expectedRbacSubject)
+	expectedRbacSubjectSA := rbacSubject{
+		Kind: "ServiceAccount",
+		RolesByScope: map[string][]simpleRole{
+			"two": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "RoleBinding",
+					Name: "testing-sa",
+				},
+			}},
+			"three": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "RoleBinding",
+					Name: "testing-sa",
+				},
+			}},
+		},
+	}
+
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadClusterRoleBindings(t *testing.T) {
@@ -70,7 +93,7 @@ func TestLoadClusterRoleBindings(t *testing.T) {
 
 	loadClusterRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 2, "Expected 2 rbac subjects")
+	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -86,8 +109,23 @@ func TestLoadClusterRoleBindings(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["joe"], expectedRbacSubject)
-	assert.EqualValues(t, l.rbacSubjectsByScope["sue"], expectedRbacSubject)
+	expectedRbacSubjectSA := rbacSubject{
+		Kind: "ServiceAccount",
+		RolesByScope: map[string][]simpleRole{
+			"cluster-wide": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "ClusterRoleBinding",
+					Name: "circleci-cluster-admin",
+				},
+			}},
+		},
+	}
+
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadAll(t *testing.T) {
@@ -103,7 +141,7 @@ func TestLoadAll(t *testing.T) {
 
 	loadAll(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 2, "Expected 2 rbac subjects")
+	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -127,8 +165,39 @@ func TestLoadAll(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["joe"], expectedRbacSubject)
-	assert.EqualValues(t, l.rbacSubjectsByScope["sue"], expectedRbacSubject)
+	expectedRbacSubjectSA := rbacSubject{
+		Kind: "ServiceAccount",
+		RolesByScope: map[string][]simpleRole{
+			"cluster-wide": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "ClusterRoleBinding",
+					Name: "circleci-cluster-admin",
+				},
+			}},
+			"two": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "RoleBinding",
+					Name: "testing-sa",
+				},
+			}},
+			"three": {{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+				Source: simpleRoleSource{
+					Kind: "RoleBinding",
+					Name: "testing-sa",
+				},
+			}},
+		},
+	}
+
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadGke(t *testing.T) {
@@ -247,7 +316,7 @@ func TestLoadGkeFilters(t *testing.T) {
 
 	assert.Len(t, l.rbacSubjectsByScope, 2, "Expected 2 rbac subjects")
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["jane@example.com"], rbacSubject{
+	assert.EqualValues(t, rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -266,9 +335,9 @@ func TestLoadGkeFilters(t *testing.T) {
 				},
 			}},
 		},
-	})
+	}, l.rbacSubjectsByScope["jane@example.com"])
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["joe@example.com"], rbacSubject{
+	assert.EqualValues(t, rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -280,7 +349,7 @@ func TestLoadGkeFilters(t *testing.T) {
 				},
 			}},
 		},
-	})
+	}, l.rbacSubjectsByScope["joe@example.com"])
 }
 
 func genLister() lister {
@@ -303,23 +372,55 @@ func loadRoleBindings(t *testing.T, l lister) {
 }
 
 func createRoleBindings(t *testing.T, l lister) {
-	roleBindings := []rbacv1.RoleBinding{{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "testing",
-			Namespace: "foo",
+	roleBindings := []rbacv1.RoleBinding{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "testing",
+				Namespace: "foo",
+			},
+			Subjects: []rbacv1.Subject{{
+				Name: "joe",
+				Kind: "User",
+			}, {
+				Name: "sue",
+				Kind: "User",
+			}},
+			RoleRef: rbacv1.RoleRef{
+				Kind: "Role",
+				Name: "bar",
+			},
 		},
-		Subjects: []rbacv1.Subject{{
-			Name: "joe",
-			Kind: "User",
-		}, {
-			Name: "sue",
-			Kind: "User",
-		}},
-		RoleRef: rbacv1.RoleRef{
-			Kind: "Role",
-			Name: "bar",
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "testing-sa",
+				Namespace: "two",
+			},
+			Subjects: []rbacv1.Subject{{
+				Name:      "circleci",
+				Kind:      "ServiceAccount",
+				Namespace: "circleci",
+			}},
+			RoleRef: rbacv1.RoleRef{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+			},
 		},
-	}}
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "testing-sa",
+				Namespace: "three",
+			},
+			Subjects: []rbacv1.Subject{{
+				Name:      "circleci",
+				Kind:      "ServiceAccount",
+				Namespace: "circleci",
+			}},
+			RoleRef: rbacv1.RoleRef{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+			},
+		},
+	}
 
 	for _, roleBinding := range roleBindings {
 		_, err := l.clientset.RbacV1().RoleBindings(roleBinding.Namespace).Create(context.Background(), &roleBinding, metav1.CreateOptions{})
@@ -334,22 +435,38 @@ func loadClusterRoleBindings(t *testing.T, l lister) {
 }
 
 func createClusterRoleBindings(t *testing.T, l lister) {
-	clusterRoleBindings := []rbacv1.ClusterRoleBinding{{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "testing",
+	clusterRoleBindings := []rbacv1.ClusterRoleBinding{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "testing",
+			},
+			Subjects: []rbacv1.Subject{{
+				Name: "joe",
+				Kind: "User",
+			}, {
+				Name: "sue",
+				Kind: "User",
+			}},
+			RoleRef: rbacv1.RoleRef{
+				Kind: "ClusterRole",
+				Name: "bar",
+			},
 		},
-		Subjects: []rbacv1.Subject{{
-			Name: "joe",
-			Kind: "User",
-		}, {
-			Name: "sue",
-			Kind: "User",
-		}},
-		RoleRef: rbacv1.RoleRef{
-			Kind: "ClusterRole",
-			Name: "bar",
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "circleci-cluster-admin",
+			},
+			Subjects: []rbacv1.Subject{{
+				Name:      "circleci",
+				Kind:      "ServiceAccount",
+				Namespace: "circleci",
+			}},
+			RoleRef: rbacv1.RoleRef{
+				Kind: "ClusterRole",
+				Name: "cluster-admin",
+			},
 		},
-	}}
+	}
 
 	for _, clusterRoleBinding := range clusterRoleBindings {
 		_, err := l.clientset.RbacV1().ClusterRoleBindings().Create(context.Background(), &clusterRoleBinding, metav1.CreateOptions{})
