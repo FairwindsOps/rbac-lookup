@@ -6,9 +6,9 @@ require (
 	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/spf13/cobra v0.0.7
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/net v0.0.0-20200822124328-c89045814202
-	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
-	google.golang.org/api v0.35.0
+	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102
+	golang.org/x/oauth2 v0.0.0-20201109201403-9fd604954f58
+	google.golang.org/api v0.36.0
 	k8s.io/api v0.19.4
 	k8s.io/apimachinery v0.19.4
 	k8s.io/client-go v0.19.4
