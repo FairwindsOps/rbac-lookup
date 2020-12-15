@@ -11,11 +11,11 @@ all: test build
 build:
 	$(GOBUILD) -o $(BINARY_NAME) -ldflags "-X main.version=$(VERSION) -X main.commit=$(COMMIT) -s -w" -v
 test:
-	printf "\n\nTests:\n\n"
+	@printf "\n\nTests:\n\n"
 	$(GOCMD) test -v --bench --benchmem -coverprofile coverage.txt -covermode=atomic ./...
 	$(GOCMD) vet ./... 2> govet-report.out
 	$(GOCMD) tool cover -html=coverage.txt -o cover-report.html
-	printf "\nCoverage report available at cover-report.html\n\n"
+	@printf "\nCoverage report available at cover-report.html\n\n"
 tidy:
 	$(GOCMD) mod tidy
 clean:
