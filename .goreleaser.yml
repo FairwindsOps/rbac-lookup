@@ -3,8 +3,15 @@
 builds:
 - env:
   - CGO_ENABLED=0
-archive:
-  replacements:
+  goos:
+  - linux
+  - darwin
+  - windows
+  goarm:
+  - 6
+  - 7
+archives:
+- replacements:
     darwin: Darwin
     linux: Linux
     windows: Windows
@@ -20,11 +27,15 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
-brew:
-  github:
+brews:
+- name: homebrew-tap
+  tap:
+    # The version control system is determined by the token in use
     owner: FairwindsOps
     name: homebrew-tap
   folder: Formula
   description: Reverse Lookup for Kubernetes RBAC
+  homepage: https://github.com/FairWindsOps/rbac-lookup
+  license: apache-2.0
   test: |
     system "#{bin}/rbac-lookup version"

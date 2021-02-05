@@ -13,8 +13,8 @@ references:
     run:
       name: Install GoReleaser
       command: |
-        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.94.0/goreleaser_amd64.deb
-        echo "8dbad6683d6fc9367e637e6eed8e01a0d63c9660  goreleaser.deb" | sha1sum -c
+        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.155.0/goreleaser_amd64.deb
+        echo "a69c2c0a924d808df408f70f49c68998eca172ec  goreleaser.deb" | sha1sum -c
         sudo dpkg -i goreleaser.deb
         rm goreleaser.deb
   e2e_config: &e2e_config
