@@ -44,7 +44,6 @@ jobs:
       - checkout
       - run: go mod download && go mod verify
       - run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
-      - run: bash <(curl -s https://codecov.io/bash)
 
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
