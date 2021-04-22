@@ -25,3 +25,9 @@ User/rob@example.com      project-wide      IAM/gcp-viewer      IAMRole/viewer
 ```
 
 At this point this integration only supports standard IAM roles, and is not advanced enough to include any custom roles. For a full list of supported roles and how they are mapped, view [lookup/gke_roles.go](https://github.com/FairwindsOps/rbac-lookup/blob/master/lookup/gke_roles.go).
+
+## Credentials
+
+This flag requires that you have `gcloud` cli access to the project in question. Please follow the [Google Documentation](https://cloud.google.com/sdk/docs/quickstart) on how to do this.
+
+Additionally, these credentials must have the necessary permissions to lookup users and their roles.
