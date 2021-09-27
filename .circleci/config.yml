@@ -98,6 +98,14 @@ workflows:
           filters:
             branches:
               only: /.*/
+      - snapshot:
+          requires:
+            - test
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              ignore: /.*/
       - rok8s-scripts/kubernetes_e2e_tests:
           name: e2e test kube 1.16
           kind_node_image: "kindest/node:v1.16.15@sha256:a89c771f7de234e6547d43695c7ab047809ffc71a0c3b65aa54eda051c45ed20"
