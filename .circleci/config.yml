@@ -13,8 +13,8 @@ references:
     run:
       name: Install GoReleaser
       command: |
-        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.155.0/goreleaser_amd64.deb
-        echo "a69c2c0a924d808df408f70f49c68998eca172ec  goreleaser.deb" | sha1sum -c
+        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.174.2/goreleaser_amd64.deb
+        echo "bad33997ea9977a84196bdca1d5993fada909cd81c3e88d52bd297666bea61a4  goreleaser.deb" | sha256sum -c
         sudo dpkg -i goreleaser.deb
         rm goreleaser.deb
   e2e_config: &e2e_config
@@ -35,7 +35,6 @@ references:
 jobs:
   test:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
-
     docker:
       - image: circleci/golang:1.13
         environment:
@@ -44,7 +43,17 @@ jobs:
       - checkout
       - run: go mod download && go mod verify
       - run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
-
+  snapshot:
+    working_directory: /go/src/github.com/fairwindsops/rbac-lookup
+    resource_class: large
+    docker:
+      - image: goreleaser/goreleaser:v0.174.2
+    steps:
+      - checkout
+      - run: goreleaser --snapshot
+      - store_artifacts:
+          path: dist
+          destination: snapshot
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
