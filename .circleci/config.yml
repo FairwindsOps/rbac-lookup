@@ -6,7 +6,7 @@ orbs:
 executors:
   golang-exec:
     docker:
-      - image: circleci/golang:1.13-stretch
+      - image: circleci/golang:1.17-stretch
 
 references:
   e2e_config: &e2e_config
@@ -28,7 +28,7 @@ jobs:
   test:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.17
         environment:
           GO111MODULE: "on"
     steps:

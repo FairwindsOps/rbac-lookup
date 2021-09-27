@@ -21,7 +21,7 @@ We label issues with the ["good first issue" tag](https://github.com/FairwindsOp
 
 ### Prerequisites
 
-* A properly configured Golang environment with Go 1.13 or higher
+* A properly configured Golang environment with Go 1.17 or higher
 * Access to a cluster via a properly configured KUBECONFIG
 
 ### Installation
