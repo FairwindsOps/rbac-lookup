@@ -32,7 +32,7 @@ changelog:
     - '^docs:'
     - '^test:'
 brews:
-- name: homebrew-tap
+- name: rbac-lookup
   tap:
     # The version control system is determined by the token in use
     owner: FairwindsOps
