@@ -9,14 +9,6 @@ executors:
       - image: circleci/golang:1.13-stretch
 
 references:
-  install_goreleaser: &install_goreleaser
-    run:
-      name: Install GoReleaser
-      command: |
-        curl -fsSLo goreleaser.deb https://github.com/goreleaser/goreleaser/releases/download/v0.174.2/goreleaser_amd64.deb
-        echo "bad33997ea9977a84196bdca1d5993fada909cd81c3e88d52bd297666bea61a4  goreleaser.deb" | sha256sum -c
-        sudo dpkg -i goreleaser.deb
-        rm goreleaser.deb
   e2e_config: &e2e_config
     command_runner_image: quay.io/reactiveops/ci-images:v11-stretch
     executor: golang-exec
@@ -56,14 +48,12 @@ jobs:
           destination: snapshot
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
+    resource_class: large
     docker:
-      - image: circleci/golang:1.13
-        environment:
-          GO111MODULE: "on"
+      - image: goreleaser/goreleaser:v0.174.2
     steps:
       - checkout
       - run: go mod download && go mod verify
-      - *install_goreleaser
       - run: goreleaser
   publish_docs:
     docker:
