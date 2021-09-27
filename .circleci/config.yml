@@ -37,7 +37,6 @@ jobs:
       - run: go test -v ./... -coverprofile=coverage.txt -covermode=atomic
   snapshot:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
-    resource_class: large
     docker:
       - image: goreleaser/goreleaser:v0.174.2
     steps:
@@ -48,7 +47,6 @@ jobs:
           destination: snapshot
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
-    resource_class: large
     docker:
       - image: goreleaser/goreleaser:v0.174.2
     steps:
