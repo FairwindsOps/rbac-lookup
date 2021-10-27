@@ -33,13 +33,13 @@ func TestLoadRoleBindings(t *testing.T) {
 
 	loadRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+	assert.Len(t, l.RbacSubjectsByScope, 0, "Expected no rbac subjects initially")
 
 	createRoleBindings(t, l)
 
 	loadRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
+	assert.Len(t, l.RbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -77,9 +77,9 @@ func TestLoadRoleBindings(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
-	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.RbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadClusterRoleBindings(t *testing.T) {
@@ -87,13 +87,13 @@ func TestLoadClusterRoleBindings(t *testing.T) {
 
 	loadClusterRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+	assert.Len(t, l.RbacSubjectsByScope, 0, "Expected no rbac subjects initially")
 
 	createClusterRoleBindings(t, l)
 
 	loadClusterRoleBindings(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
+	assert.Len(t, l.RbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -123,9 +123,9 @@ func TestLoadClusterRoleBindings(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
-	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.RbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadAll(t *testing.T) {
@@ -133,7 +133,7 @@ func TestLoadAll(t *testing.T) {
 
 	loadAll(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+	assert.Len(t, l.RbacSubjectsByScope, 0, "Expected no rbac subjects initially")
 
 	createRoleBindings(t, l)
 
@@ -141,7 +141,7 @@ func TestLoadAll(t *testing.T) {
 
 	loadAll(t, l)
 
-	assert.Len(t, l.rbacSubjectsByScope, 3, "Expected 3 rbac subjects")
+	assert.Len(t, l.RbacSubjectsByScope, 3, "Expected 3 rbac subjects")
 
 	expectedRbacSubject := rbacSubject{
 		Kind: "User",
@@ -195,9 +195,9 @@ func TestLoadAll(t *testing.T) {
 		},
 	}
 
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["joe"])
-	assert.EqualValues(t, expectedRbacSubject, l.rbacSubjectsByScope["sue"])
-	assert.EqualValues(t, expectedRbacSubjectSA, l.rbacSubjectsByScope["circleci:circleci"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["joe"])
+	assert.EqualValues(t, expectedRbacSubject, l.RbacSubjectsByScope["sue"])
+	assert.EqualValues(t, expectedRbacSubjectSA, l.RbacSubjectsByScope["circleci:circleci"])
 }
 
 func TestLoadGke(t *testing.T) {
@@ -219,13 +219,13 @@ func TestLoadGke(t *testing.T) {
 
 	l := genLister()
 
-	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+	assert.Len(t, l.RbacSubjectsByScope, 0, "Expected no rbac subjects initially")
 
 	l.loadGkeIamPolicy(policy)
 
-	assert.Len(t, l.rbacSubjectsByScope, 4, "Expected 4 rbac subjects")
+	assert.Len(t, l.RbacSubjectsByScope, 4, "Expected 4 rbac subjects")
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["jane@example.com"], rbacSubject{
+	assert.EqualValues(t, l.RbacSubjectsByScope["jane@example.com"], rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -246,7 +246,7 @@ func TestLoadGke(t *testing.T) {
 		},
 	})
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["joe@example.com"], rbacSubject{
+	assert.EqualValues(t, l.RbacSubjectsByScope["joe@example.com"], rbacSubject{
 		Kind: "User",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -260,7 +260,7 @@ func TestLoadGke(t *testing.T) {
 		},
 	})
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["devs@example.com"], rbacSubject{
+	assert.EqualValues(t, l.RbacSubjectsByScope["devs@example.com"], rbacSubject{
 		Kind: "Group",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -274,7 +274,7 @@ func TestLoadGke(t *testing.T) {
 		},
 	})
 
-	assert.EqualValues(t, l.rbacSubjectsByScope["ci@example.iam.gserviceaccount.com"], rbacSubject{
+	assert.EqualValues(t, l.RbacSubjectsByScope["ci@example.iam.gserviceaccount.com"], rbacSubject{
 		Kind: "ServiceAccount",
 		RolesByScope: map[string][]simpleRole{
 			"project-wide": {{
@@ -307,14 +307,14 @@ func TestLoadGkeFilters(t *testing.T) {
 	}
 
 	l := genLister()
-	l.filter = "example"
-	l.subjectKind = "user"
+	l.Filter = "example"
+	l.SubjectKind = "user"
 
-	assert.Len(t, l.rbacSubjectsByScope, 0, "Expected no rbac subjects initially")
+	assert.Len(t, l.RbacSubjectsByScope, 0, "Expected no rbac subjects initially")
 
 	l.loadGkeIamPolicy(policy)
 
-	assert.Len(t, l.rbacSubjectsByScope, 2, "Expected 2 rbac subjects")
+	assert.Len(t, l.RbacSubjectsByScope, 2, "Expected 2 rbac subjects")
 
 	assert.EqualValues(t, rbacSubject{
 		Kind: "User",
@@ -335,7 +335,7 @@ func TestLoadGkeFilters(t *testing.T) {
 				},
 			}},
 		},
-	}, l.rbacSubjectsByScope["jane@example.com"])
+	}, l.RbacSubjectsByScope["jane@example.com"])
 
 	assert.EqualValues(t, rbacSubject{
 		Kind: "User",
@@ -349,29 +349,29 @@ func TestLoadGkeFilters(t *testing.T) {
 				},
 			}},
 		},
-	}, l.rbacSubjectsByScope["joe@example.com"])
+	}, l.RbacSubjectsByScope["joe@example.com"])
 }
 
-func genLister() lister {
-	return lister{
-		clientset:           testclient.NewSimpleClientset(),
-		rbacSubjectsByScope: make(map[string]rbacSubject),
+func genLister() Lister {
+	return Lister{
+		Clientset:           testclient.NewSimpleClientset(),
+		RbacSubjectsByScope: make(map[string]rbacSubject),
 	}
 }
 
-func loadAll(t *testing.T, l lister) {
+func loadAll(t *testing.T, l Lister) {
 	err := l.loadAll()
 
 	assert.Nil(t, err, "Expected no error loading all rbac Bindings")
 }
 
-func loadRoleBindings(t *testing.T, l lister) {
+func loadRoleBindings(t *testing.T, l Lister) {
 	err := l.loadRoleBindings()
 
 	assert.Nil(t, err, "Expected no error loading role bindings")
 }
 
-func createRoleBindings(t *testing.T, l lister) {
+func createRoleBindings(t *testing.T, l Lister) {
 	roleBindings := []rbacv1.RoleBinding{
 		{
 			ObjectMeta: metav1.ObjectMeta{
@@ -423,18 +423,18 @@ func createRoleBindings(t *testing.T, l lister) {
 	}
 
 	for _, roleBinding := range roleBindings {
-		_, err := l.clientset.RbacV1().RoleBindings(roleBinding.Namespace).Create(context.Background(), &roleBinding, metav1.CreateOptions{})
+		_, err := l.Clientset.RbacV1().RoleBindings(roleBinding.Namespace).Create(context.Background(), &roleBinding, metav1.CreateOptions{})
 		assert.Nil(t, err, "Expected no error creating role bindings")
 	}
 }
 
-func loadClusterRoleBindings(t *testing.T, l lister) {
+func loadClusterRoleBindings(t *testing.T, l Lister) {
 	err := l.loadClusterRoleBindings()
 
 	assert.Nil(t, err, "Expected no error loading cluster role bindings")
 }
 
-func createClusterRoleBindings(t *testing.T, l lister) {
+func createClusterRoleBindings(t *testing.T, l Lister) {
 	clusterRoleBindings := []rbacv1.ClusterRoleBinding{
 		{
 			ObjectMeta: metav1.ObjectMeta{
@@ -469,7 +469,7 @@ func createClusterRoleBindings(t *testing.T, l lister) {
 	}
 
 	for _, clusterRoleBinding := range clusterRoleBindings {
-		_, err := l.clientset.RbacV1().ClusterRoleBindings().Create(context.Background(), &clusterRoleBinding, metav1.CreateOptions{})
+		_, err := l.Clientset.RbacV1().ClusterRoleBindings().Create(context.Background(), &clusterRoleBinding, metav1.CreateOptions{})
 		assert.Nil(t, err, "Expected no error creating cluster role bindings")
 	}
 }

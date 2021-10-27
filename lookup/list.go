@@ -47,11 +47,11 @@ func List(args []string, kubeConfig, kubeContext, outputFormat, subjectKind stri
 		filter = args[0]
 	}
 
-	l := lister{
-		filter:              filter,
-		subjectKind:         subjectKind,
-		clientset:           clientset,
-		rbacSubjectsByScope: make(map[string]rbacSubject),
+	l := Lister{
+		Filter:              filter,
+		SubjectKind:         subjectKind,
+		Clientset:           clientset,
+		RbacSubjectsByScope: make(map[string]rbacSubject),
 	}
 
 	if enableGke {
@@ -62,7 +62,7 @@ func List(args []string, kubeConfig, kubeContext, outputFormat, subjectKind stri
 		}
 
 		ci := getClusterInfo(&rawConfig, kubeContext)
-		l.gkeParsedProjectName = ci.ParsedProjectName
+		l.GkeParsedProjectName = ci.ParsedProjectName
 	}
 
 	loadErr := l.loadAll()

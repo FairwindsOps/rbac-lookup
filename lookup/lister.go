@@ -32,15 +32,15 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
-type lister struct {
-	clientset            kubernetes.Interface
-	filter               string
-	gkeParsedProjectName string
-	subjectKind          string
-	rbacSubjectsByScope  map[string]rbacSubject
+type Lister struct {
+	Clientset            kubernetes.Interface
+	Filter               string
+	GkeParsedProjectName string
+	SubjectKind          string
+	RbacSubjectsByScope  map[string]rbacSubject
 }
 
-func (l *lister) loadAll() error {
+func (l *Lister) loadAll() error {
 	rbErr := l.loadRoleBindings()
 
 	if rbErr != nil {
@@ -53,8 +53,8 @@ func (l *lister) loadAll() error {
 		return crbErr
 	}
 
-	if l.gkeParsedProjectName != "" {
-		policy, gkeErr := loadGkeIAMPolicy(l.gkeParsedProjectName)
+	if l.GkeParsedProjectName != "" {
+		policy, gkeErr := loadGkeIAMPolicy(l.GkeParsedProjectName)
 
 		if gkeErr != nil {
 			return gkeErr
@@ -66,14 +66,14 @@ func (l *lister) loadAll() error {
 	return nil
 }
 
-func (l *lister) printRbacBindings(outputFormat string) {
-	if len(l.rbacSubjectsByScope) < 1 {
+func (l *Lister) printRbacBindings(outputFormat string) {
+	if len(l.RbacSubjectsByScope) < 1 {
 		fmt.Println("No RBAC Bindings found")
 		return
 	}
 
-	names := make([]string, 0, len(l.rbacSubjectsByScope))
-	for name := range l.rbacSubjectsByScope {
+	names := make([]string, 0, len(l.RbacSubjectsByScope))
+	for name := range l.RbacSubjectsByScope {
 		names = append(names, name)
 	}
 	sort.Strings(names)
@@ -88,7 +88,7 @@ func (l *lister) printRbacBindings(outputFormat string) {
 	}
 
 	for _, subjectName := range names {
-		rbacSubject := l.rbacSubjectsByScope[subjectName]
+		rbacSubject := l.RbacSubjectsByScope[subjectName]
 		for scope, simpleRoles := range rbacSubject.RolesByScope {
 			for _, simpleRole := range simpleRoles {
 				if outputFormat == "wide" {
@@ -102,8 +102,8 @@ func (l *lister) printRbacBindings(outputFormat string) {
 	w.Flush()
 }
 
-func (l *lister) loadRoleBindings() error {
-	roleBindings, err := l.clientset.RbacV1().RoleBindings("").List(context.Background(), metav1.ListOptions{})
+func (l *Lister) loadRoleBindings() error {
+	roleBindings, err := l.Clientset.RbacV1().RoleBindings("").List(context.Background(), metav1.ListOptions{})
 
 	if err != nil {
 		fmt.Println("Error loading role bindings")
@@ -117,7 +117,7 @@ func (l *lister) loadRoleBindings() error {
 				if subject.Kind == "ServiceAccount" {
 					subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
 				}
-				if rbacSubj, exist := l.rbacSubjectsByScope[subjectKey]; exist {
+				if rbacSubj, exist := l.RbacSubjectsByScope[subjectKey]; exist {
 					rbacSubj.addRoleBinding(&roleBinding)
 				} else {
 					rbacSubj := rbacSubject{
@@ -126,7 +126,7 @@ func (l *lister) loadRoleBindings() error {
 					}
 					rbacSubj.addRoleBinding(&roleBinding)
 
-					l.rbacSubjectsByScope[subjectKey] = rbacSubj
+					l.RbacSubjectsByScope[subjectKey] = rbacSubj
 				}
 			}
 		}
@@ -135,8 +135,8 @@ func (l *lister) loadRoleBindings() error {
 	return nil
 }
 
-func (l *lister) loadClusterRoleBindings() error {
-	clusterRoleBindings, err := l.clientset.RbacV1().ClusterRoleBindings().List(context.Background(), metav1.ListOptions{})
+func (l *Lister) loadClusterRoleBindings() error {
+	clusterRoleBindings, err := l.Clientset.RbacV1().ClusterRoleBindings().List(context.Background(), metav1.ListOptions{})
 
 	if err != nil {
 		fmt.Println("Error loading cluster role bindings")
@@ -150,7 +150,7 @@ func (l *lister) loadClusterRoleBindings() error {
 				if subject.Kind == "ServiceAccount" {
 					subjectKey = fmt.Sprintf("%s:%s", subject.Namespace, subject.Name)
 				}
-				if rbacSubj, exist := l.rbacSubjectsByScope[subjectKey]; exist {
+				if rbacSubj, exist := l.RbacSubjectsByScope[subjectKey]; exist {
 					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
 				} else {
 					rbacSubj := rbacSubject{
@@ -159,7 +159,7 @@ func (l *lister) loadClusterRoleBindings() error {
 					}
 					rbacSubj.addClusterRoleBinding(&clusterRoleBinding)
 
-					l.rbacSubjectsByScope[subjectKey] = rbacSubj
+					l.RbacSubjectsByScope[subjectKey] = rbacSubj
 				}
 			}
 		}
@@ -168,7 +168,7 @@ func (l *lister) loadClusterRoleBindings() error {
 	return nil
 }
 
-func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
+func (l *Lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 	for _, binding := range policy.Bindings {
 		if sr, ok := gkeIamRoles[binding.Role]; ok {
 			for _, member := range binding.Members {
@@ -176,7 +176,7 @@ func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 				memberKind := strings.Title(s[0])
 				memberName := s[1]
 				if l.nameMatches(memberName) && l.kindMatches(memberKind) {
-					rbacSubj, exist := l.rbacSubjectsByScope[memberName]
+					rbacSubj, exist := l.RbacSubjectsByScope[memberName]
 					if !exist {
 						rbacSubj = rbacSubject{
 							Kind:         memberKind,
@@ -185,23 +185,23 @@ func (l *lister) loadGkeIamPolicy(policy *cloudresourcemanager.Policy) {
 					}
 
 					rbacSubj.RolesByScope[gkeIamScope] = append(rbacSubj.RolesByScope[gkeIamScope], sr)
-					l.rbacSubjectsByScope[memberName] = rbacSubj
+					l.RbacSubjectsByScope[memberName] = rbacSubj
 				}
 			}
 		}
 	}
 }
 
-func (l *lister) nameMatches(name string) bool {
-	return l.filter == "" || strings.Contains(name, l.filter)
+func (l *Lister) nameMatches(name string) bool {
+	return l.Filter == "" || strings.Contains(name, l.Filter)
 }
 
-func (l *lister) kindMatches(kind string) bool {
-	if l.subjectKind == "" {
+func (l *Lister) kindMatches(kind string) bool {
+	if l.SubjectKind == "" {
 		return true
 	}
 
 	lowerKind := strings.ToLower(kind)
 
-	return lowerKind == l.subjectKind
+	return lowerKind == l.SubjectKind
 }
