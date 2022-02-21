@@ -29,6 +29,18 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+release:
+  prerelease: auto
+  footer: |
+    You can verify the signature of the checksums.txt file using [cosign](https://github.com/sigstore/cosign).
+
+    ```
+    cosign verify-blob checksums.txt --signature=checksums.txt.sig  --key https://artifacts.fairwinds.com/cosign.pub
+    ```
+signs:
+- cmd: cosign
+  args: ["sign-blob", "--key=hashivault://cosign", "-output-signature=${signature}", "${artifact}"]
+  artifacts: checksum
 brews:
 - name: rbac-lookup
   tap:
