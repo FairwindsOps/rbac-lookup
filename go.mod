@@ -8,8 +8,8 @@ require (
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb
 	google.golang.org/api v0.83.0
-	k8s.io/api v0.24.1
-	k8s.io/apimachinery v0.24.1
+	k8s.io/api v0.24.2
+	k8s.io/apimachinery v0.24.2
 	k8s.io/client-go v0.24.1
 )
 
