@@ -111,7 +111,7 @@ workflows:
             tags:
               only: /.*/
       - oss-docs/publish-docs:
-          repository: rbac-manager
+          repository: rbac-lookup
           filters:
             branches:
               #ignore: /.*/
