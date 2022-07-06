@@ -114,7 +114,6 @@ workflows:
           repository: rbac-lookup
           filters:
             branches:
-              #ignore: /.*/
-              only: sudermanjr/oss-docs
+              ignore: /.*/
             tags:
               only: /^.*/
