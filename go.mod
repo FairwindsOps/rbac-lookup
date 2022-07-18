@@ -9,7 +9,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220628200809-02e64fa58f26
 	google.golang.org/api v0.86.0
 	k8s.io/api v0.24.2
-	k8s.io/apimachinery v0.24.2
+	k8s.io/apimachinery v0.24.3
 	k8s.io/client-go v0.24.2
 )
 
