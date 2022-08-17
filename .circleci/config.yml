@@ -46,7 +46,7 @@ jobs:
   snapshot:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: goreleaser/goreleaser:v1.3.0
+      - image: goreleaser/goreleaser:v1.10.3
     steps:
       - checkout
       - setup_remote_docker
@@ -57,7 +57,7 @@ jobs:
   release:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: goreleaser/goreleaser:v1.3.0
+      - image: goreleaser/goreleaser:v1.10.3
     steps:
       - checkout
       - setup_remote_docker
