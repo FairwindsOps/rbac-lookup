@@ -7,7 +7,7 @@ orbs:
 executors:
   golang-exec:
     docker:
-      - image: cimg/go:1.18
+      - image: cimg/go:1.19
 
 references:
   e2e_config: &e2e_config
@@ -29,14 +29,14 @@ references:
       command: |
         apk --update add curl yq
         cd /tmp
-        curl -LO https://releases.hashicorp.com/vault/1.9.3/vault_1.9.3_linux_amd64.zip
-        unzip vault_1.9.3_linux_amd64.zip
+        curl -LO https://releases.hashicorp.com/vault/1.9.10/vault_1.9.10_linux_amd64.zip
+        unzip vault_1.9.10_linux_amd64.zip
         mv vault /usr/bin/vault
 jobs:
   test:
     working_directory: /home/circleci/go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: cimg/go:1.18
+      - image: cimg/go:1.19
         environment:
           GO111MODULE: "on"
     steps:
@@ -47,7 +47,7 @@ jobs:
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     resource_class: large
     docker:
-      - image: goreleaser/goreleaser:v1.10.3
+      - image: goreleaser/goreleaser:v1.13.1
     steps:
       - checkout
       - setup_remote_docker
@@ -59,7 +59,7 @@ jobs:
     resource_class: large
     working_directory: /go/src/github.com/fairwindsops/rbac-lookup
     docker:
-      - image: goreleaser/goreleaser:v1.10.3
+      - image: goreleaser/goreleaser:v1.13.1
     steps:
       - checkout
       - setup_remote_docker
