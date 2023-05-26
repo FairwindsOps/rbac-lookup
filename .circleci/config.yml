@@ -10,7 +10,7 @@ executors:
       - image: cimg/go:1.20
 
 references:
-  e2e_configuration: &e2e_configiguration
+  e2e_configuration: &e2e_configuration
     command_runner_image: quay.io/reactiveops/ci-images:v12-stretch
     executor: golang-exec
     pre_script: e2e/pre.sh
