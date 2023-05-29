@@ -3,7 +3,7 @@ module github.com/fairwindsops/rbac-lookup
 go 1.19
 
 require (
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/net v0.5.0
 	golang.org/x/oauth2 v0.4.0
