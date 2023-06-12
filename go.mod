@@ -7,7 +7,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.10.0
 	golang.org/x/oauth2 v0.8.0
-	google.golang.org/api v0.125.0
+	google.golang.org/api v0.126.0
 	k8s.io/api v0.27.2
 	k8s.io/apimachinery v0.27.2
 	k8s.io/client-go v0.27.2
