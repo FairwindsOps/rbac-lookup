@@ -14,7 +14,7 @@ references:
     command_runner_image: quay.io/reactiveops/ci-images:v12-buster
     executor: golang-exec
     pre_script: e2e/pre.sh
-    store-test-results: /tmp/test-results
+    store-test-results: /tmp/test-results/
     script: e2e/test.sh
     requires:
       - test
