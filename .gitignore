@@ -11,3 +11,4 @@ cover.html
 /e2e/tests/rbac-lookup
 node_modules
 /dist
+docs/README.md
