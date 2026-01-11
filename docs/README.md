@@ -31,6 +31,11 @@ asdf install rbac-lookup latest
 asdf global rbac-lookup latest
 ```
 
+### [Mise en place](https://mise.jdx.dev)
+```
+mise use -g rbac-lookup@latest
+```
+
 ## RBAC Manager
 While RBAC Lookup helps provide visibility into Kubernetes auth, RBAC Manager helps make auth simpler to manage. This is a Kubernetes operator that enables more concise RBAC configuration that is easier to scale and automate. For more information, see [RBAC Manager on GitHub](https://github.com/FairwindsOps/rbac-manager).
 
