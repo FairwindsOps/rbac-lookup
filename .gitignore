@@ -12,3 +12,6 @@ cover.html
 node_modules
 /dist
 docs/README.md
+docs/index.md
+docs/.vitepress/cache
+docs/.vitepress/dist
